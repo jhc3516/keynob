@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "device": {
+    "vendorId": "514C",
+    "productId": "8850",
+    "serial": "",
+    "layout": "12-key-2-knob"
+  },
+  "hotkeys": [
+    {
+      "id": "key01_new_task",
+      "label": "ChatGPT 이전 대화",
+      "hotkey": { "modifiers": [], "key": "Numpad1" },
+      "action": { "type": "chatgpt_input", "operation": "previous_conversation" }
+    },
+    {
+      "id": "key02_project_task",
+      "label": "ChatGPT 작업 검색/전환",
+      "hotkey": { "modifiers": [], "key": "Numpad2" },
+      "action": { "type": "chatgpt_input", "operation": "switch_chat" }
+    },
+    {
+      "id": "key03_review",
+      "label": "ChatGPT 다음 대화",
+      "hotkey": { "modifiers": [], "key": "Numpad3" },
+      "action": { "type": "chatgpt_input", "operation": "next_conversation" }
+    },
+    {
+      "id": "key04_test",
+      "label": "Typeless 음성 입력",
+      "hotkey": { "modifiers": ["Control", "Windows", "Alt"], "key": "None" },
+      "controllerRegistration": false,
+      "action": { "type": "app_shortcut", "command": "Typeless Dictation" }
+    },
+    {
+      "id": "key05_diagnose",
+      "label": "오류 진단",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F5" },
+      "action": { "type": "workspace_prompt", "prompt": "현재 프로젝트에서 재현 가능한 오류와 이상 상태를 조사하고 원인을 설명해줘." }
+    },
+    {
+      "id": "key06_explain",
+      "label": "프로젝트 설명",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F6" },
+      "action": { "type": "workspace_prompt", "prompt": "이 프로젝트의 구조, 실행 방법, 핵심 흐름을 간결하게 설명해줘." }
+    },
+    {
+      "id": "key07_docs",
+      "label": "문서 점검",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F7" },
+      "action": { "type": "workspace_prompt", "prompt": "README와 사용 문서를 점검하고 실제 코드와 맞지 않는 부분을 알려줘." }
+    },
+    {
+      "id": "key08_git_status",
+      "label": "Typeless 번역",
+      "hotkey": { "modifiers": [], "key": "F13" },
+      "controllerRegistration": false,
+      "action": { "type": "app_shortcut", "command": "Typeless Translation" }
+    },
+    {
+      "id": "key09_skills",
+      "label": "Skills 열기",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F9" },
+      "action": { "type": "deep_link", "uri": "codex://skills" }
+    },
+    {
+      "id": "key10_automations",
+      "label": "자동화 열기",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F10" },
+      "action": { "type": "deep_link", "uri": "codex://automations" }
+    },
+    {
+      "id": "key11_settings",
+      "label": "설정 열기",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "F11" },
+      "action": { "type": "deep_link", "uri": "codex://settings" }
+    },
+    {
+      "id": "key12_cli",
+      "label": "ChatGPT Enter",
+      "hotkey": { "modifiers": [], "key": "Numpad0" },
+      "action": { "type": "chatgpt_input", "operation": "enter" }
+    }
+  ],
+  "knobHotkeys": [
+    {
+      "id": "knob1_reasoning_down",
+      "label": "추론 강도 낮춤",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "Left" },
+      "controllerRegistration": false,
+      "action": { "type": "app_shortcut", "command": "Decrease the current composer reasoning effort" }
+    },
+    {
+      "id": "knob1_reasoning_up",
+      "label": "추론 강도 높임",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "Right" },
+      "controllerRegistration": false,
+      "action": { "type": "app_shortcut", "command": "Increase the current composer reasoning effort" }
+    },
+    {
+      "id": "knob1_reasoning_medium",
+      "label": "추론 강도 중간",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "Enter" },
+      "controllerRegistration": true,
+      "action": { "type": "reasoning_shortcut", "operation": "medium" }
+    }
+  ],
+  "bottomKnobHotkeys": [
+    {
+      "id": "knob2_model_up",
+      "label": "모델 메뉴 위로",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "Up" },
+      "controllerRegistration": true,
+      "action": { "type": "chatgpt_input", "operation": "menu_up" }
+    },
+    {
+      "id": "knob2_model_down",
+      "label": "모델 메뉴 아래로",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "Down" },
+      "controllerRegistration": true,
+      "action": { "type": "chatgpt_input", "operation": "menu_down" }
+    },
+    {
+      "id": "knob2_model_select",
+      "label": "모델 선택 열기",
+      "hotkey": { "modifiers": ["Control", "Shift", "Alt"], "key": "M" },
+      "controllerRegistration": true,
+      "action": { "type": "chatgpt_input", "operation": "model_selector" }
+    }
+  ],
+  "hardwareAliases": [
+    { "input": "knob1_ccw", "emits": "Ctrl+Shift+Alt+Left", "actionId": "knob1_reasoning_down" },
+    { "input": "knob1_cw", "emits": "Ctrl+Shift+Alt+Right", "actionId": "knob1_reasoning_up" },
+    { "input": "knob1_press", "emits": "Ctrl+Shift+Alt+Enter", "actionId": "knob1_reasoning_medium" },
+    { "input": "knob2_ccw", "emits": "Ctrl+Shift+Alt+Up", "actionId": "knob2_model_up" },
+    { "input": "knob2_cw", "emits": "Ctrl+Shift+Alt+Down", "actionId": "knob2_model_down" },
+    { "input": "knob2_press", "emits": "Ctrl+Shift+Alt+M", "actionId": "knob2_model_select" }
+  ]
+}

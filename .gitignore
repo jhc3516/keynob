@@ -1,0 +1,27 @@
+# Local runtime state, caches, backups, and downloaded vendor tools
+.runtime/
+backups/
+vendor/
+etc/
+.tmp-downloads/
+
+# Application and native build outputs
+artifacts/
+build/
+bin/
+**/bin/
+**/obj/
+**/*_wpftmp.csproj
+Start-CodexCli.exe
+tools/*.dll
+tools/*.exp
+tools/*.lib
+*.obj
+*.pdb
+*.ilk
+
+# Local IDE and agent state
+.vs/
+.agents/
+*.suo
+*.user
