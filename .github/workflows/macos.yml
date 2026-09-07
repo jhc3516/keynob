@@ -49,7 +49,7 @@ jobs:
         run: |
           app_path='artifacts/macos/MacroPad Studio.app'
           plutil -lint "$app_path/Contents/Info.plist"
-          lipo -verify_arch arm64 x86_64 "$app_path/Contents/MacOS/MacroPadStudioMac"
-          lipo -verify_arch arm64 x86_64 "$app_path/Contents/MacOS/macropad-status-hook"
+          lipo "$app_path/Contents/MacOS/MacroPadStudioMac" -verify_arch arm64 x86_64
+          lipo "$app_path/Contents/MacOS/macropad-status-hook" -verify_arch arm64 x86_64
           codesign --verify --deep --strict --verbose=2 "$app_path"
           ./scripts/test-macos-hook.sh "$app_path/Contents/MacOS/macropad-status-hook"
