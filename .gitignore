@@ -23,5 +23,7 @@ tools/*.lib
 # Local IDE and agent state
 .vs/
 .agents/
+.codex-work/
+**/.build/
 *.suo
 *.user

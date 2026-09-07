@@ -1,0 +1,55 @@
+name: macOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'macos/**'
+      - 'scripts/*macos*.sh'
+      - '.github/workflows/macos.yml'
+  pull_request:
+    paths:
+      - 'macos/**'
+      - 'scripts/*macos*.sh'
+      - '.github/workflows/macos.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test and build (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: |
+          sw_vers
+          swift --version
+          xcode-select -p
+      - name: Tests without hardware writes
+        env:
+          MACROPAD_REQUIRE_XCTEST: '1'
+        run: ./scripts/test-macos.sh
+      - name: Universal app bundle
+        run: ./scripts/build-macos-app.sh
+      - name: Verify bundle and packaged hook
+        run: |
+          app_path='artifacts/macos/MacroPad Studio.app'
+          plutil -lint "$app_path/Contents/Info.plist"
+          lipo -verify_arch arm64 x86_64 "$app_path/Contents/MacOS/MacroPadStudioMac"
+          lipo -verify_arch arm64 x86_64 "$app_path/Contents/MacOS/macropad-status-hook"
+          codesign --verify --deep --strict --verbose=2 "$app_path"
+          ./scripts/test-macos-hook.sh "$app_path/Contents/MacOS/macropad-status-hook"
