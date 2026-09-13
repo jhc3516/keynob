@@ -69,6 +69,43 @@ private func runSelfTest() throws -> SelfTestSummary {
     try check(MacKeyCodeCatalog.cgKeyCode(hidCode: 0x06) == 8 &&
         MacKeyCodeCatalog.cgKeyCode(hidCode: 0x73) == nil &&
         !MacKeyCodeCatalog.regularKeys.contains(where: { $0.code == 0x73 }), "mac_app_key_support")
+    let appKeymap = Data("""
+    [{"command":"composer.decreaseReasoningEffort","key":"Ctrl+Command+Alt+F13"},
+     {"command":"composer.increaseReasoningEffort","key":"Ctrl+Command+Alt+F17"}]
+    """.utf8)
+    let reasoningDown = try CodexAppKeybindings.shortcut(for: "reasoning_down", data: appKeymap)
+    let reasoningUp = try CodexAppKeybindings.shortcut(for: "reasoning_up", data: appKeymap)
+    try check(reasoningDown == DeviceShortcut(modifierCodes: [0xF1, 0xF3, 0xF4], keyCode: 0x68) &&
+        reasoningUp == DeviceShortcut(modifierCodes: [0xF1, 0xF3, 0xF4], keyCode: 0x6C), "reasoning_uses_app_keymap")
+    try check(CodexAppKeybindings.parseAccelerator("Control+Option+CmdOrCtrl+Left") ==
+        DeviceShortcut(modifierCodes: [0xF1, 0xF3, 0xF4], keyCode: 0x50), "app_keymap_mac_modifiers")
+    try check(["Ctrl+F24", "Ctrl", "Ctrl+", "Ctrl+Ctrl+F13", "Ctrl+K Ctrl+C", "Hyper+F13"]
+        .allSatisfy { CodexAppKeybindings.parseAccelerator($0) == nil }, "unsupported_accelerators_rejected")
+    for json in ["[]", "[{\"command\":\"composer.decreaseReasoningEffort\",\"key\":null}]", """
+    [{"command":"composer.decreaseReasoningEffort","key":"F13"},
+     {"command":"composer.decreaseReasoningEffort","key":null}]
+    """] {
+        do {
+            _ = try CodexAppKeybindings.shortcut(for: "reasoning_down", data: Data(json.utf8))
+            throw SelfTestFailure(check: "unassigned_reasoning_fails_closed")
+        } catch CodexAppKeybindingError.unassignedCommand { passed += 1 }
+    }
+    for json in ["{}", "{", "[{\"command\":\"other.command\"}]"] {
+        do {
+            _ = try CodexAppKeybindings.shortcut(for: "reasoning_up", data: Data(json.utf8))
+            throw SelfTestFailure(check: "invalid_app_keymap_rejected")
+        } catch CodexAppKeybindingError.invalidFile { passed += 1 }
+    }
+    let alternateKeys = Data("""
+    [{"command":"other.command","key":"F15"},
+     {"command":"composer.increaseReasoningEffort","key":"Ctrl+F24"},
+     {"command":"composer.increaseReasoningEffort","key":"Option+F18"}]
+    """.utf8)
+    let alternateShortcut = try CodexAppKeybindings.shortcut(for: "reasoning_up", data: alternateKeys)
+    try check(alternateShortcut == DeviceShortcut(modifierCodes: [0xF3], keyCode: 0x6D),
+        "app_keymap_supported_alternative")
+    try check(CodexAppKeybindings.commandID(for: "reasoning_medium") == nil,
+        "reasoning_cycle_is_not_medium")
     let appF24 = RoutedBinding(scope: .chatGPT, actionKind: .shortcut, shortcut: DeviceShortcut(keyCode: 0x73))
     do {
         _ = try BindingCompiler.compile(appF24, layer: 1, input: EditableInput.all[0])
@@ -142,6 +179,24 @@ private func runSelfTest() throws -> SelfTestSummary {
     try FileManager.default.setAttributes([.posixPermissions: 0o644], ofItemAtPath: settingsURL.path)
     let loadedSettings = try settingsStore.load()
     try check(loadedSettings == settings, "routing_settings_roundtrip")
+    let keymapURL = settingsDirectory.appendingPathComponent("keybindings.json")
+    let keymapReader = CodexAppKeybindings(url: keymapURL)
+    do {
+        _ = try keymapReader.shortcut(for: "reasoning_down")
+        throw SelfTestFailure(check: "missing_keymap_rejected")
+    } catch CodexAppKeybindingError.unreadableFile { passed += 1 }
+    for key in ["F13", "F14"] {
+        let keymapData = Data("[{\"command\":\"composer.decreaseReasoningEffort\",\"key\":\"\(key)\"}]".utf8)
+        try keymapData.write(to: keymapURL)
+        try FileManager.default.setAttributes([.posixPermissions: 0o400], ofItemAtPath: keymapURL.path)
+        let currentShortcut = try keymapReader.shortcut(for: "reasoning_down")
+        let dataAfterRead = try Data(contentsOf: keymapURL)
+        let permissionsAfterRead = try FileManager.default.attributesOfItem(atPath: keymapURL.path)[.posixPermissions] as? NSNumber
+        try check(currentShortcut == CodexAppKeybindings.parseAccelerator(key), "app_keymap_reloaded")
+        try check(dataAfterRead == keymapData && permissionsAfterRead?.intValue == 0o400,
+            "app_keymap_not_modified")
+        try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: keymapURL.path)
+    }
     var legacySettings = settings
     legacySettings[1, EditableInput.all[0]] = appF24
     try settingsStore.save(legacySettings)
@@ -371,9 +426,16 @@ do {
         printJSON(ProbeEnvelope(ok: true, result: MutationSummary(
             changed: original != aliasReport, reportsWritten: original == aliasReport ? 0 : 4,
             restored: true, backupPath: store.url.path)))
+    case "read-app-shortcuts":
+        let keymap = CodexAppKeybindings()
+        var shortcuts: [String: DeviceShortcut] = [:]
+        for actionID in ["reasoning_down", "reasoning_up"] {
+            shortcuts[actionID] = try keymap.shortcut(for: actionID)
+        }
+        printJSON(ProbeEnvelope(ok: true, result: shortcuts))
     case "self-test": printJSON(ProbeEnvelope(ok: true, result: try runSelfTest()))
     case "help", "--help", "-h":
-        print("Usage: macropad-probe [discover | read-layer 1|2|3 | read-led | backup [path] | program-slot layer slot expectedHex replacementHex [backupPath] | program-led expectedMode expectedColorsHex targetMode targetColorsHex [backupPath] | restore-backup [path] --confirm-family-device | diagnostic-slot-rollback layer slot [backupPath] | diagnostic-routing-alias-rollback layer slot [backupPath] | diagnostic-led-rollback [backupPath] | self-test]")
+        print("Usage: macropad-probe [discover | read-layer 1|2|3 | read-led | read-app-shortcuts | backup [path] | program-slot layer slot expectedHex replacementHex [backupPath] | program-led expectedMode expectedColorsHex targetMode targetColorsHex [backupPath] | restore-backup [path] --confirm-family-device | diagnostic-slot-rollback layer slot [backupPath] | diagnostic-routing-alias-rollback layer slot [backupPath] | diagnostic-led-rollback [backupPath] | self-test]")
     default: throw MacroPadHIDError.bridge(code: 64, message: "unsupported_command")
     }
 } catch {

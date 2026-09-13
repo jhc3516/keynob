@@ -39,6 +39,14 @@ MacroPad Studio가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤
 `~/Library/Application Support/MacroPad Studio/settings.json`에 권한 `0600`의 평문으로
 저장되므로 암호·토큰 같은 비밀은 넣지 마세요.
 
+### ChatGPT/Codex 추론 수준 단축키
+
+`추론 수준 낮추기`와 `추론 수준 높이기`는 대상 데스크톱 앱의 `composer.decreaseReasoningEffort`와 `composer.increaseReasoningEffort`에 등록된 단축키를 읽어 전달합니다. 대상 앱의 **설정 › 키보드 단축키**에서 두 동작을 먼저 등록하세요. [공식 단축키 설정 안내](https://learn.chatgpt.com/docs/reference/commands#keyboard-shortcuts)
+
+이 연동은 `com.openai.codex` 데스크톱 앱과 `~/.codex/keybindings.json`을 사용합니다. MacroPad Studio에 `CODEX_HOME` 환경 변수가 있으면 그 디렉터리의 파일을 읽으므로, 대상 앱과 같은 디렉터리를 사용해야 합니다. 키맵은 입력마다 다시 읽으며 생성하거나 수정하지 않습니다. 단축키가 없거나 해제되어 있거나 지원하지 않는 키 조합이면 입력을 보내지 않고 `앱 · Codex` 탭에 이유를 표시합니다.
+
+매크로패드에 저장하는 `Control+Shift+Option` 별칭과 대상 앱의 동작 단축키는 서로 다른 설정입니다. 별칭은 MacroPad Studio가 입력을 구별하는 용도이며, 대상 앱이 그 조합을 추론 수준 명령으로 알아듣는다는 뜻은 아닙니다. 이 연동 수정은 낮추기·높이기에 한정됩니다. `추론 수준 Medium`과 다른 내장 동작의 실물 호환성은 별도로 검증해야 합니다.
+
 ## Karabiner-Elements 사용 시
 
 Karabiner-Elements는 MacroPad Studio의 필수 구성요소가 아닙니다. 설치되어 있다면 매크로패드만
@@ -113,6 +121,14 @@ open "artifacts/macos/MacroPad Studio.app"
 만들어진 앱은 로컬 ad-hoc 서명만 적용됩니다. 다른 Mac에 배포하려면 Developer ID 서명과
 Apple 공증 절차가 별도로 필요합니다.
 
+앱을 다시 빌드해 교체하면 실행 파일의 서명이 달라져 기존 손쉬운 사용 허용이 맞지 않을 수 있습니다. 목록에서 켜져 있는데도 새 앱의 권한 검사가 실패한다면 MacroPad Studio를 종료하고, 아래 명령으로 **이 앱의 이전 허용만 초기화**한 뒤 현재 `.app`을 손쉬운 사용 목록에 다시 추가하고 허용하세요. 이 명령은 다른 앱의 권한을 초기화하지 않으며, 재등록에는 사용자의 macOS 인증이 필요할 수 있습니다.
+
+```bash
+/usr/bin/tccutil reset Accessibility io.github.jhc3516.macropad-studio.macos
+```
+
+재등록 후 MacroPad Studio에서 `새로 고침`과 `권한 확인 후 시작`을 실행합니다. 앱 빌드나 실행 과정에서 권한을 자동 초기화하지는 않습니다.
+
 ## CLI와 테스트
 
 읽기와 무변경 시험:
@@ -122,6 +138,7 @@ swift run --package-path macos macropad-probe self-test
 swift run --package-path macos macropad-probe discover
 swift run --package-path macos macropad-probe read-layer 1
 swift run --package-path macos macropad-probe read-led
+swift run --package-path macos macropad-probe read-app-shortcuts
 swift run --package-path macos macropad-probe backup
 ./scripts/test-macos.sh
 ```
@@ -141,6 +158,7 @@ CLI 복원은 동일한 이유로 `--confirm-family-device` 플래그를 반드�
 
 `self-test`는 하드웨어를 변경하지 않고 요청 바이트, 장치 선택, 보고서 검증, 단축키 왕복,
 54개 라우팅 별칭의 유일성, 범위 규칙, 설정 왕복, LED 팔레트와 백업 오염 감지를 검사합니다.
+`read-app-shortcuts`는 실제 사용자 키맵에서 추론 수준 낮추기·높이기 단축키를 읽기만 하며, 키 입력을 보내지 않습니다. 자체 검사에는 키맵 해석, 미등록·해제·잘못된 형식의 입력 차단, 파일 변경 반영 및 원본 보존 검사도 포함됩니다.
 `scripts/test-macos-hook.sh`는 임시 Unix 소켓에서 훅 이벤트 전달과 프롬프트 본문 미전달을 검사합니다.
 로컬 Swift 컴파일러와 SDK 버전이 맞지 않으면 `swift test` 자체가 시작되지 않을 수 있으므로
 Xcode/Command Line Tools 버전을 맞춰야 합니다.
@@ -158,8 +176,10 @@ beta.2의 USB 검증은 macOS 26.5.1 Apple Silicon에서 수행했습니다. USB
 `Layer 1 / KEY 1 / ChatGPT에서만 / 텍스트 입력 /model`을 추가로 확인했습니다. 손쉬운 사용·입력 전송
 권한 검사와 라우터 활성 상태가 정상인데도 입력되지 않았으나, 매크로패드의 `Modify events`만 끈 뒤
 설치된 대상 앱의 입력칸에 `/model`이 입력되는 것을 사용자가 실물 키로 확인했습니다.
-이 결과는 한 장치·한 키·한 텍스트 동작에 한정되며, 비대상 앱에서의 차단이나 다른 키·노브·전용 CLI
-동작까지 통과했다는 뜻은 아닙니다.
+
+같은 환경의 ChatGPT/Codex 데스크톱 앱 `26.903.71938`에서는 `Layer 1 / KNOB 1 / ChatGPT에서만`의 CCW(반시계 방향) `추론 수준 낮추기`와 CW(시계 방향) `추론 수준 높이기`도 사용자가 실물로 확인했습니다. 고정 단축키 대신 대상 앱의 등록된 단축키를 읽도록 수정한 앱으로 교체하고, 새 실행 파일의 손쉬운 사용 권한을 다시 등록한 뒤 양방향 동작을 확인했습니다. 대상 앱의 단축키 파일, MacroPad의 키 설정과 Karabiner 제외 설정은 변경하지 않았습니다.
+
+이 실물 결과는 한 장치의 KEY 1 텍스트 입력과 KNOB 1 양방향 추론 수준 조절에 한정됩니다. KNOB 1 누르기의 `Medium`, KNOB 2, 다른 레이어, 비대상 앱에서의 차단과 전용 CLI 동작까지 통과했다는 뜻은 아닙니다.
 
 전체 수동 점검은 다음 순서로 수행하세요.
 

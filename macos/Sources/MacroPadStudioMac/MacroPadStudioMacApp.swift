@@ -449,6 +449,11 @@ private struct ContentView: View {
                     Text(action.displayName).tag(Optional(action.id))
                 }
             }.frame(maxWidth: 400)
+            if binding.scope == .chatGPT,
+               let id = binding.builtInActionID, CodexAppKeybindings.commandID(for: id) != nil {
+                Text("대상 ChatGPT/Codex 앱에 등록된 추론 수준 단축키를 읽어 사용합니다. 대상 앱의 설정 › 키보드 단축키에 낮추기·높이기가 등록되어 있어야 합니다.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
         }
     }
 
@@ -487,6 +492,9 @@ private struct ContentView: View {
                 GroupBox("ChatGPT · Codex CLI 입력 라우터") {
                     VStack(alignment: .leading, spacing: 10) {
                         Label(appRouting.message, systemImage: appRouting.isRunning ? "checkmark.circle.fill" : "hand.raised")
+                        if let error = appRouting.actionError {
+                            Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
+                        }
                         HStack {
                             Button(appRouting.isRunning ? "라우터 다시 시작" : "권한 확인 후 시작") {
                                 appRouting.requestAccessibilityAndStart()

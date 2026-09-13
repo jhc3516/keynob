@@ -18,6 +18,7 @@ final class AppRoutingRuntime: ObservableObject {
     @Published private(set) var isRunning = false
     @Published private(set) var accessibilityGranted = AXIsProcessTrusted()
     @Published private(set) var message = "앱별 동작을 사용하려면 손쉬운 사용 권한이 필요합니다."
+    @Published private(set) var actionError: String?
 
     private let router = MacInputRouter()
     private let dispatcher = InputActionDispatcher()
@@ -38,9 +39,12 @@ final class AppRoutingRuntime: ObservableObject {
         do {
             try router.start(settings: settings) { [weak self] alias, binding, target in
                 guard let self else { return }
-                self.dispatcher.dispatch(binding, expectedTarget: target)
+                self.dispatcher.dispatch(binding, expectedTarget: target) { [weak self] error in
+                    self?.actionError = error
+                }
             }
             isRunning = true
+            actionError = nil
             message = "ChatGPT·Codex CLI 전용 입력 라우터가 실행 중입니다."
         } catch {
             isRunning = false
@@ -51,6 +55,7 @@ final class AppRoutingRuntime: ObservableObject {
     func stop() {
         router.stop()
         isRunning = false
+        actionError = nil
         message = "앱별 입력 라우터를 중지했습니다."
     }
 }
@@ -162,10 +167,28 @@ private final class MacInputRouter: @unchecked Sendable {
 
 @MainActor
 private final class InputActionDispatcher {
-    func dispatch(_ binding: RoutedBinding, expectedTarget: ForegroundTarget) {
+    func dispatch(
+        _ binding: RoutedBinding, expectedTarget: ForegroundTarget,
+        completion: @escaping @MainActor (String?) -> Void
+    ) {
         guard expectedTarget.scope != .global, (try? BindingCompiler.validate(binding)) == true else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { [weak self] in
             guard let self, ForegroundScopeDetector.currentTarget() == expectedTarget else { return }
+            if binding.scope == .chatGPT, binding.actionKind == .builtIn,
+               let id = binding.builtInActionID, CodexAppKeybindings.commandID(for: id) != nil {
+                do {
+                    guard NSRunningApplication(processIdentifier: expectedTarget.processID)?.bundleIdentifier == "com.openai.codex" else {
+                        throw CodexAppKeybindingError.unsupportedAction
+                    }
+                    let shortcut = try CodexAppKeybindings().shortcut(for: id)
+                    guard ForegroundScopeDetector.currentTarget() == expectedTarget else { return }
+                    self.send(shortcut: shortcut)
+                    completion(nil)
+                } catch {
+                    completion(error.localizedDescription)
+                }
+                return
+            }
             switch binding.actionKind {
             case .disabled: break
             case .shortcut: self.send(shortcut: binding.shortcut)
@@ -173,6 +196,7 @@ private final class InputActionDispatcher {
             case .builtIn:
                 if let id = binding.builtInActionID { self.sendBuiltIn(id, scope: expectedTarget.scope) }
             }
+            completion(nil)
         }
     }
 
@@ -228,8 +252,6 @@ private final class InputActionDispatcher {
             case "next_conversation": postKey(121, modifiers: .maskControl)
             case "switch_chat": postKey(5, modifiers: .maskControl)
             case "enter": postKey(36)
-            case "reasoning_down": postKey(123, modifiers: [.maskControl, .maskShift, .maskAlternate])
-            case "reasoning_up": postKey(124, modifiers: [.maskControl, .maskShift, .maskAlternate])
             case "reasoning_medium":
                 for _ in 0..<6 { postKey(123, modifiers: [.maskControl, .maskShift, .maskAlternate]) }
                 postKey(124, modifiers: [.maskControl, .maskShift, .maskAlternate])
