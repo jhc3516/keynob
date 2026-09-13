@@ -12,7 +12,7 @@ $form = $null
 $textBox = $null
 $originalNoHardwareWrites = $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES
 
-if (@(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue).Count -ne 0) {
+if (@(Get-Process Keynob -ErrorAction SilentlyContinue).Count -ne 0) {
     throw 'Stop Codex Keyboard Studio before this no-write integration test.'
 }
 $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES = '1'
@@ -30,7 +30,7 @@ try {
 
     Add-Type -AssemblyName System.Windows.Forms
     $form = [System.Windows.Forms.Form]::new()
-    $form.Text = 'Codex CLI - MacroPad Studio - V1 integration probe'
+    $form.Text = 'Codex CLI - Keynob - V1 integration probe'
     $form.Width = 480
     $form.Height = 180
     $textBox = [System.Windows.Forms.TextBox]::new()

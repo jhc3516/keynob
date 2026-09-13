@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $portable = Join-Path $root 'artifacts\portable'
 $required = @(
-    'CodexKeyboardStudio.exe', 'KeyboardDeviceBridge.exe', 'CodexStatusHookClient.exe', 'Start-CodexCli.exe',
+    'Keynob.exe', 'KeyboardDeviceBridge.exe', 'CodexStatusHookClient.exe', 'Start-CodexCli.exe',
     'hidapi.dll', 'coreclr.dll', 'hostfxr.dll', 'PresentationFramework.dll', 'LICENSE', 'THIRD_PARTY_NOTICES.md',
     'DOTNET-LIBRARY-LICENSE.txt', 'DOTNET-MIT-LICENSE.txt', 'DOTNET-THIRD-PARTY-NOTICES.txt',
     'WPF-THIRD-PARTY-NOTICES.txt', 'WINDOWS-SDK-LICENSE.rtf',

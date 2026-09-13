@@ -7,10 +7,10 @@ repo_root="${script_dir:h}"
 configuration="${1:-release}"
 package_path="$repo_root/macos"
 output_root="$repo_root/artifacts/macos"
-app_path="$output_root/MacroPad Studio.app"
+app_path="$output_root/Keynob.app"
 mkdir -p "$output_root"
-staging_root="$(mktemp -d "$output_root/.macropad-staging.XXXXXX")"
-staged_app="$staging_root/MacroPad Studio.app"
+staging_root="$(mktemp -d "$output_root/.keynob-staging.XXXXXX")"
+staged_app="$staging_root/Keynob.app"
 
 cleanup() {
     rm -rf "$staging_root"
@@ -29,14 +29,14 @@ x86_bin="$(swift build --package-path "$package_path" --configuration "$configur
     --triple x86_64-apple-macosx13.0 --scratch-path "$x86_build" --show-bin-path)"
 
 mkdir -p "$staged_app/Contents/MacOS"
-lipo -create "$arm_bin/MacroPadStudioMac" "$x86_bin/MacroPadStudioMac" \
-    -output "$staged_app/Contents/MacOS/MacroPadStudioMac"
-lipo -create "$arm_bin/macropad-status-hook" "$x86_bin/macropad-status-hook" \
-    -output "$staged_app/Contents/MacOS/macropad-status-hook"
-chmod 755 "$staged_app/Contents/MacOS/macropad-status-hook"
+lipo -create "$arm_bin/Keynob" "$x86_bin/Keynob" \
+    -output "$staged_app/Contents/MacOS/Keynob"
+lipo -create "$arm_bin/keynob-status-hook" "$x86_bin/keynob-status-hook" \
+    -output "$staged_app/Contents/MacOS/keynob-status-hook"
+chmod 755 "$staged_app/Contents/MacOS/keynob-status-hook"
 cp "$package_path/App/Info.plist" "$staged_app/Contents/Info.plist"
 
-codesign --force --sign - "$staged_app/Contents/MacOS/macropad-status-hook"
+codesign --force --sign - "$staged_app/Contents/MacOS/keynob-status-hook"
 codesign --force --sign - "$staged_app"
 rm -rf "$app_path"
 mv "$staged_app" "$app_path"

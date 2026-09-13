@@ -23,7 +23,7 @@ if (-not ($allowedRoots | Where-Object { $output.StartsWith($_ + [IO.Path]::Dire
     throw 'Release output must be inside this repository artifacts or .runtime directory.'
 }
 foreach ($required in @(
-    'CodexKeyboardStudio.exe', 'KeyboardDeviceBridge.exe', 'hidapi.dll', 'LICENSE', 'THIRD_PARTY_NOTICES.md',
+    'Keynob.exe', 'KeyboardDeviceBridge.exe', 'hidapi.dll', 'LICENSE', 'THIRD_PARTY_NOTICES.md',
     'DOTNET-LIBRARY-LICENSE.txt', 'DOTNET-MIT-LICENSE.txt', 'DOTNET-THIRD-PARTY-NOTICES.txt',
     'WPF-THIRD-PARTY-NOTICES.txt', 'WINDOWS-SDK-LICENSE.rtf')) {
     if (-not (Test-Path -LiteralPath (Join-Path $portable $required) -PathType Leaf)) { throw "Portable input is incomplete: $required" }
@@ -35,7 +35,7 @@ if (Get-ChildItem -LiteralPath $portable -Filter '*.pdb' -File -Recurse | Select
 
 if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Recurse -Force }
 New-Item -ItemType Directory -Path $output -Force | Out-Null
-$packageName = "MacroPadStudio-$Version-win-x64"
+$packageName = "Keynob-$Version-win-x64"
 $zipPath = Join-Path $output ($packageName + '.zip')
 Add-Type -AssemblyName System.IO.Compression
 $stream = [IO.File]::Open($zipPath, [IO.FileMode]::CreateNew)
@@ -73,7 +73,7 @@ $sourceBytes = [Text.Encoding]::UTF8.GetBytes(($sourceLines -join "`n") + "`n")
 $sha256 = [Security.Cryptography.SHA256]::Create()
 try { $sourceHash = ([BitConverter]::ToString($sha256.ComputeHash($sourceBytes))).Replace('-', '').ToLowerInvariant() }
 finally { $sha256.Dispose() }
-[IO.File]::WriteAllText((Join-Path $output "MacroPadStudio-$Version-source.sha256"), "$sourceHash  public-source`n", $utf8)
+[IO.File]::WriteAllText((Join-Path $output "Keynob-$Version-source.sha256"), "$sourceHash  public-source`n", $utf8)
 Copy-Item -LiteralPath (Join-Path $source 'docs\release-notes-v1.0.0-beta.1.md') -Destination (Join-Path $output 'RELEASE_NOTES.md') -Force
 
 Write-Output "PUBLIC_RELEASE_PASS zip=$zipPath sha256=$zipHash sourceSha256=$sourceHash files=$(@(Get-ChildItem -LiteralPath $portable -File -Recurse).Count)"

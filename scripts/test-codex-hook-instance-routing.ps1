@@ -32,8 +32,8 @@ if (-not (Test-Path -LiteralPath $HookClient)) {
 if (-not (Test-Path -LiteralPath $Launcher)) {
     throw "Native launcher is missing: $Launcher"
 }
-if (Get-Process -Name CodexKeyboardStudio -ErrorAction SilentlyContinue) {
-    throw 'Stop CodexKeyboardStudio before the isolated named-pipe routing test.'
+if (Get-Process -Name Keynob -ErrorAction SilentlyContinue) {
+    throw 'Stop Keynob before the isolated named-pipe routing test.'
 }
 
 function Receive-StatusMessage {

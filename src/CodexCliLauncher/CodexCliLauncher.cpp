@@ -17,7 +17,7 @@
 
 namespace {
 
-constexpr wchar_t kWindowMarker[] = L"Codex CLI - MacroPad Studio";
+constexpr wchar_t kWindowMarker[] = L"Codex CLI - Keynob";
 constexpr wchar_t kInstanceEnvironmentVariable[] = L"CODEX_KEYBOARD_INSTANCE_ID";
 constexpr wchar_t kDisableTerminalTitleUpdates[] = L"tui.terminal_title=[]";
 constexpr wchar_t kPipePath[] = L"\\\\.\\pipe\\CodexKeyboardStudio.Status.v1";

@@ -13,7 +13,7 @@ $originalNoHardwareWrites = $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES
 $originalHookDiagnostics = $env:CODEX_KEYBOARD_TEST_HOOK_DIAGNOSTICS
 $originalDataDirectory = $env:CODEX_KEYBOARD_STUDIO_DATA_DIR
 $originalTestPipeName = $env:CODEX_KEYBOARD_TEST_STATUS_PIPE_NAME
-$testDataDirectory = Join-Path ([IO.Path]::GetTempPath()) ("CodexKeyboardStudio.RuntimeTests-" + [Guid]::NewGuid().ToString('N'))
+$testDataDirectory = Join-Path ([IO.Path]::GetTempPath()) ("Keynob.RuntimeTests-" + [Guid]::NewGuid().ToString('N'))
 $testPipeName = 'CodexKeyboardStudio.Status.v1.Test.runtime-' + [Guid]::NewGuid().ToString('N')
 $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES = '1'
 $env:CODEX_KEYBOARD_TEST_HOOK_DIAGNOSTICS = '1'
@@ -61,7 +61,7 @@ $stage = 'background_restart'
 $startupBaseline = if (Test-Path -LiteralPath $logPath) { @(Get-Content -LiteralPath $logPath -Encoding UTF8).Count } else { 0 }
 & $start | Out-Null
 & $start | Out-Null
-$processes = @(Get-Process CodexKeyboardStudio -ErrorAction Stop)
+$processes = @(Get-Process Keynob -ErrorAction Stop)
 if ($processes.Count -ne 1) { throw "Single-instance test failed: $($processes.Count) processes." }
 $pipeReady = $false
 for ($attempt = 0; $attempt -lt 20; $attempt++) {
@@ -227,7 +227,7 @@ if ($statusLedMaxMs -ge 1000) {
 
 $stage = 'graceful_shutdown'
 & $stop | Out-Null
-if (@(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue).Count -ne 0) {
+if (@(Get-Process Keynob -ErrorAction SilentlyContinue).Count -ne 0) {
     throw 'Graceful shutdown left an app process running.'
 }
 $stage = 'offline_hook'

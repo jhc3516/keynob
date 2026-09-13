@@ -2,7 +2,7 @@
 param()
 
 $ErrorActionPreference = 'Stop'
-$processes = @(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue)
+$processes = @(Get-Process Keynob -ErrorAction SilentlyContinue)
 if ($processes.Count -eq 0) {
     Write-Output 'V1_BACKGROUND_STOP_OK mode=not-running'
     exit 0

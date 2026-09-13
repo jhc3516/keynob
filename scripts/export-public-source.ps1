@@ -26,23 +26,23 @@ function Copy-PublicFile([string]$sourceRelative, [string]$destinationRelative =
 }
 
 foreach ($file in @(
-    '.gitattributes', '.gitignore', 'CodexKeyboardStudio.sln', 'NuGet.Config', 'NuGet.Portable.Config',
+    '.gitattributes', '.gitignore', 'Keynob.sln', 'NuGet.Config', 'NuGet.Portable.Config',
     'LICENSE', 'THIRD_PARTY_NOTICES.md', 'DOTNET-LIBRARY-LICENSE.txt', 'DOTNET-MIT-LICENSE.txt',
     'DOTNET-THIRD-PARTY-NOTICES.txt', 'WPF-THIRD-PARTY-NOTICES.txt', 'WINDOWS-SDK-LICENSE.rtf')) {
     Copy-PublicFile $file
 }
-Copy-PublicFile 'docs\public-readme.md' 'README.md'
-Copy-PublicFile 'docs\device-protocol-v2.md' 'docs\device-protocol.md'
+Copy-PublicFile 'README.md'
+Copy-PublicFile 'docs\device-protocol.md'
 Copy-PublicFile 'docs\release-notes-v1.0.0-beta.1.md' 'docs\release-notes-v1.0.0-beta.1.md'
 foreach ($file in @(
-    'assets\codex-keyboard.ico', 'assets\macropad-studio.jpg',
+    'assets\keynob.ico', 'assets\keynob.jpg',
     'config\codex-keymap.json')) {
     Copy-PublicFile $file
 }
 
-foreach ($directory in @('src', 'tests')) {
+foreach ($directory in @('src', 'tests', 'macos', 'docs', '.github')) {
     Get-ChildItem -LiteralPath (Join-Path $root $directory) -File -Recurse |
-        Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' } |
+        Where-Object { $_.FullName -notmatch '[\\/](bin|obj|\.build)[\\/]' } |
         ForEach-Object {
             $relative = $_.FullName.Substring($root.Length + 1)
             Copy-PublicFile $relative
@@ -51,6 +51,7 @@ foreach ($directory in @('src', 'tests')) {
 
 $publicScripts = @(
     'prepare-hidapi.ps1', 'build-v1-app.ps1', 'build-v1-portable.ps1',
+    'build-macos-app.sh', 'test-macos.sh', 'test-macos-hook.sh',
     'export-public-source.ps1', 'build-public-release.ps1', 'check-readiness.ps1',
     'start-background.ps1', 'stop-background.ps1', 'toggle-background.ps1',
     'install-codex-hooks.ps1', 'codex-status-hook.ps1', 'set-codex-cli-status.ps1',
@@ -92,7 +93,7 @@ foreach ($file in $textFiles) {
 foreach ($required in @(
     '.gitattributes', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'DOTNET-LIBRARY-LICENSE.txt',
     'DOTNET-MIT-LICENSE.txt', 'DOTNET-THIRD-PARTY-NOTICES.txt', 'WPF-THIRD-PARTY-NOTICES.txt',
-    'WINDOWS-SDK-LICENSE.rtf', 'assets\macropad-studio.jpg', 'scripts\prepare-hidapi.ps1')) {
+    'WINDOWS-SDK-LICENSE.rtf', 'assets\keynob.jpg', 'scripts\prepare-hidapi.ps1')) {
     if (-not (Test-Path -LiteralPath (Join-Path $output $required))) { throw "Public source is incomplete: $required" }
 }
 

@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 . (Join-Path $PSScriptRoot 'test-window-focus-helper.ps1')
-$app = Join-Path $root 'artifacts\portable\CodexKeyboardStudio.exe'
+$app = Join-Path $root 'artifacts\portable\Keynob.exe'
 $runtimeRoot = Join-Path $root '.runtime'
 $testRoot = Join-Path $runtimeRoot ('v2-app-routing-' + [Guid]::NewGuid().ToString('N'))
 $settingsRoot = Join-Path $testRoot 'settings'
@@ -19,7 +19,7 @@ $layer2Marker = 'V3_LAYER2_ROUTE_PASS'
 $layer3Marker = 'V3_LAYER3_ROUTE_PASS'
 $previousDataRoot = $env:CODEX_KEYBOARD_STUDIO_DATA_DIR
 $previousNoHardwareWrites = $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES
-$existingApp = @(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue | Select-Object -First 1)
+$existingApp = @(Get-Process Keynob -ErrorAction SilentlyContinue | Select-Object -First 1)
 $existingAppPath = if ($existingApp.Count -eq 1) { $existingApp[0].Path } else { $null }
 $chatGptProbe = $null
 $form = $null
@@ -170,7 +170,7 @@ public static class ChatGptProbeProgram {
     $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES = '1'
     Start-Process -FilePath $app -ArgumentList '--background' -WorkingDirectory (Split-Path -Parent $app) -WindowStyle Hidden
     Start-Sleep -Seconds 2
-    if (@(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue).Count -ne 1) {
+    if (@(Get-Process Keynob -ErrorAction SilentlyContinue).Count -ne 1) {
         throw 'Studio did not start with isolated settings.'
     }
 
@@ -199,7 +199,7 @@ public static class ChatGptProbeProgram {
     Send-Alias 0x70
     if ($textBox.Text.Length -ne 0) { throw 'ChatGPT scoped input leaked into a non-target window.' }
 
-    $form.Text = 'Codex CLI - MacroPad Studio - V2 integration probe'
+    $form.Text = 'Codex CLI - Keynob - V2 integration probe'
     $textBox.Clear()
     Set-ProbeForeground $form.Handle $form
     $textBox.Focus() | Out-Null

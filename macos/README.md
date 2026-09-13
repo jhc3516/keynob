@@ -1,7 +1,11 @@
-# MacroPad Studio for macOS
+# Keynob for macOS
 
-기존 Windows 구현과 나란히 유지되는 네이티브 Swift/SwiftUI 포트입니다. 지원 장치를 정확히
+ChatGPT 앱과 Codex CLI를 키·노브로 제어하는 Keynob의 네이티브 Swift/SwiftUI 앱입니다.
+Windows 구현과 나란히 유지됩니다. 지원 장치를 정확히
 식별하고 세 레이어의 키·노브, 앱별 동작과 12개 LED를 읽고 설정합니다.
+
+이전 MacroPad Studio의 설정 경로와 번들 ID는 호환성을 위해 유지합니다.
+[이전 버전에서 업그레이드](../README.md#이전-버전에서-업그레이드)
 
 ## 지원 범위
 
@@ -21,7 +25,7 @@ Windows판의 Typeless 범위와 Typeless 동작은 macOS판에서 지원하지 
 일반 키 목록은 macOS가 전달할 수 있는 키로 제한됩니다. F21~F24, PrintScreen 등 일부 PC 전용
 키는 앱 전용 목록에 없지만 장치 직접 입력 목록에는 유지됩니다. 모든 프로그램
 범위는 장치가 직접 실행합니다. ChatGPT·Codex CLI 범위는 장치에 고유 별칭을 기록하고 실행 중인
-MacroPad Studio가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤 동작을 전달합니다.
+Keynob가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤 동작을 전달합니다.
 라우터가 실행 중이면 비대상 앱에서는 설정된 별칭을 소비하고 동작을 전달하지 않습니다.
 
 ## 앱별 동작과 권한
@@ -29,12 +33,12 @@ MacroPad Studio가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤
 1. 앱에서 장치를 새로 고친 뒤 키 또는 노브의 범위를 `ChatGPT에서만` 또는
    `Codex CLI에서만`으로 정하고 동작을 적용합니다.
 2. `앱 · Codex` 탭에서 `권한 확인 후 시작`을 누릅니다.
-3. macOS의 `개인정보 보호 및 보안 › 손쉬운 사용`에서 MacroPad Studio를 허용하고 라우터를
+3. macOS의 `개인정보 보호 및 보안 › 손쉬운 사용`에서 Keynob를 허용하고 라우터를
    다시 시작합니다.
 4. Codex CLI 범위는 같은 탭의 전용 실행기로 작업 폴더를 골라 연 Terminal 창에서만 동작합니다.
    Terminal 제어를 처음 사용할 때 macOS 자동화 권한 확인이 나타날 수 있습니다.
 
-앱별 동작은 MacroPad Studio가 실행 중이어야 합니다. 앱이 꺼져 있거나 권한이 없으면 장치가 보내는
+앱별 동작은 Keynob가 실행 중이어야 합니다. 앱이 꺼져 있거나 권한이 없으면 장치가 보내는
 별칭 조합이 그대로 전달될 수 있으므로, 앱별 범위를 사용할 때 앱을 먼저 실행하세요. 텍스트 동작은
 `~/Library/Application Support/MacroPad Studio/settings.json`에 권한 `0600`의 평문으로
 저장되므로 암호·토큰 같은 비밀은 넣지 마세요.
@@ -43,13 +47,13 @@ MacroPad Studio가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤
 
 `추론 수준 낮추기`와 `추론 수준 높이기`는 대상 데스크톱 앱의 `composer.decreaseReasoningEffort`와 `composer.increaseReasoningEffort`에 등록된 단축키를 읽어 전달합니다. 대상 앱의 **설정 › 키보드 단축키**에서 두 동작을 먼저 등록하세요. [공식 단축키 설정 안내](https://learn.chatgpt.com/docs/reference/commands#keyboard-shortcuts)
 
-이 연동은 `com.openai.codex` 데스크톱 앱과 `~/.codex/keybindings.json`을 사용합니다. MacroPad Studio에 `CODEX_HOME` 환경 변수가 있으면 그 디렉터리의 파일을 읽으므로, 대상 앱과 같은 디렉터리를 사용해야 합니다. 키맵은 입력마다 다시 읽으며 생성하거나 수정하지 않습니다. 단축키가 없거나 해제되어 있거나 지원하지 않는 키 조합이면 입력을 보내지 않고 `앱 · Codex` 탭에 이유를 표시합니다.
+이 연동은 `com.openai.codex` 데스크톱 앱과 `~/.codex/keybindings.json`을 사용합니다. Keynob에 `CODEX_HOME` 환경 변수가 있으면 그 디렉터리의 파일을 읽으므로, 대상 앱과 같은 디렉터리를 사용해야 합니다. 키맵은 입력마다 다시 읽으며 생성하거나 수정하지 않습니다. 단축키가 없거나 해제되어 있거나 지원하지 않는 키 조합이면 입력을 보내지 않고 `앱 · Codex` 탭에 이유를 표시합니다.
 
-매크로패드에 저장하는 `Control+Shift+Option` 별칭과 대상 앱의 동작 단축키는 서로 다른 설정입니다. 별칭은 MacroPad Studio가 입력을 구별하는 용도이며, 대상 앱이 그 조합을 추론 수준 명령으로 알아듣는다는 뜻은 아닙니다. 이 연동 수정은 낮추기·높이기에 한정됩니다. `추론 수준 Medium`과 다른 내장 동작의 실물 호환성은 별도로 검증해야 합니다.
+매크로패드에 저장하는 `Control+Shift+Option` 별칭과 대상 앱의 동작 단축키는 서로 다른 설정입니다. 별칭은 Keynob가 입력을 구별하는 용도이며, 대상 앱이 그 조합을 추론 수준 명령으로 알아듣는다는 뜻은 아닙니다. 이 연동 수정은 낮추기·높이기에 한정됩니다. `추론 수준 Medium`과 다른 내장 동작의 실물 호환성은 별도로 검증해야 합니다.
 
 ## Karabiner-Elements 사용 시
 
-Karabiner-Elements는 MacroPad Studio의 필수 구성요소가 아닙니다. 설치되어 있다면 매크로패드만
+Karabiner-Elements는 Keynob의 필수 구성요소가 아닙니다. 설치되어 있다면 매크로패드만
 Karabiner 입력 처리에서 제외하는 것을 권장합니다. 손쉬운 사용 권한이 허용되고 라우터가 실행 중이어도,
 Karabiner가 장치 입력을 함께 처리하면 앱별 동작이 실행되지 않을 수 있습니다.
 
@@ -58,7 +62,7 @@ Karabiner가 장치 입력을 함께 처리하면 앱별 동작이 실행되지 
    장치 이름은 `USB Composite Device`로 표시될 수 있으므로 이름만으로 선택하지 마세요.
 3. 해당 장치의 `Modify events`만 끕니다. 다른 키보드의 설정은 변경하지 않으며,
    Karabiner 전체를 종료하거나 삭제할 필요도 없습니다.
-4. MacroPad Studio에서 `새로 고침` 후 입력 라우터를 시작하고, 대상 앱의 빈 입력칸에서 실물 키를
+4. Keynob에서 `새로 고침` 후 입력 라우터를 시작하고, 대상 앱의 빈 입력칸에서 실물 키를
    다시 테스트합니다. 이미 라우터가 실행 중이면 그대로 테스트할 수 있습니다.
 
 이 설정은 현재 Karabiner 프로필에 저장됩니다. 프로필을 바꾸면 매크로패드의 제외 상태도 다시
@@ -113,33 +117,33 @@ Xcode 또는 현재 macOS와 버전이 맞는 Xcode Command Line Tools, Swift 6 
 추가 패키지나 Homebrew 설치는 필요하지 않습니다.
 
 ```bash
-swift run --package-path macos MacroPadStudioMac
+swift run --package-path macos Keynob
 ./scripts/build-macos-app.sh
-open "artifacts/macos/MacroPad Studio.app"
+open "artifacts/macos/Keynob.app"
 ```
 
 만들어진 앱은 로컬 ad-hoc 서명만 적용됩니다. 다른 Mac에 배포하려면 Developer ID 서명과
 Apple 공증 절차가 별도로 필요합니다.
 
-앱을 다시 빌드해 교체하면 실행 파일의 서명이 달라져 기존 손쉬운 사용 허용이 맞지 않을 수 있습니다. 목록에서 켜져 있는데도 새 앱의 권한 검사가 실패한다면 MacroPad Studio를 종료하고, 아래 명령으로 **이 앱의 이전 허용만 초기화**한 뒤 현재 `.app`을 손쉬운 사용 목록에 다시 추가하고 허용하세요. 이 명령은 다른 앱의 권한을 초기화하지 않으며, 재등록에는 사용자의 macOS 인증이 필요할 수 있습니다.
+앱을 다시 빌드해 교체하면 실행 파일의 서명이 달라져 기존 손쉬운 사용 허용이 맞지 않을 수 있습니다. 목록에서 켜져 있는데도 새 앱의 권한 검사가 실패한다면 Keynob를 종료하고, 아래 명령으로 **이 앱의 이전 허용만 초기화**한 뒤 현재 `.app`을 손쉬운 사용 목록에 다시 추가하고 허용하세요. 이 명령은 다른 앱의 권한을 초기화하지 않으며, 재등록에는 사용자의 macOS 인증이 필요할 수 있습니다.
 
 ```bash
 /usr/bin/tccutil reset Accessibility io.github.jhc3516.macropad-studio.macos
 ```
 
-재등록 후 MacroPad Studio에서 `새로 고침`과 `권한 확인 후 시작`을 실행합니다. 앱 빌드나 실행 과정에서 권한을 자동 초기화하지는 않습니다.
+재등록 후 Keynob에서 `새로 고침`과 `권한 확인 후 시작`을 실행합니다. 앱 빌드나 실행 과정에서 권한을 자동 초기화하지는 않습니다.
 
 ## CLI와 테스트
 
 읽기와 무변경 시험:
 
 ```bash
-swift run --package-path macos macropad-probe self-test
-swift run --package-path macos macropad-probe discover
-swift run --package-path macos macropad-probe read-layer 1
-swift run --package-path macos macropad-probe read-led
-swift run --package-path macos macropad-probe read-app-shortcuts
-swift run --package-path macos macropad-probe backup
+swift run --package-path macos keynob-probe self-test
+swift run --package-path macos keynob-probe discover
+swift run --package-path macos keynob-probe read-layer 1
+swift run --package-path macos keynob-probe read-led
+swift run --package-path macos keynob-probe read-app-shortcuts
+swift run --package-path macos keynob-probe backup
 ./scripts/test-macos.sh
 ```
 
@@ -147,13 +151,13 @@ swift run --package-path macos macropad-probe backup
 되돌립니다. 장치가 안정적으로 연결된 상태에서만 사용하세요.
 
 ```bash
-swift run --package-path macos macropad-probe diagnostic-slot-rollback 3 1
-swift run --package-path macos macropad-probe diagnostic-routing-alias-rollback 3 1
-swift run --package-path macos macropad-probe diagnostic-led-rollback
+swift run --package-path macos keynob-probe diagnostic-slot-rollback 3 1
+swift run --package-path macos keynob-probe diagnostic-routing-alias-rollback 3 1
+swift run --package-path macos keynob-probe diagnostic-led-rollback
 ```
 
 CLI 복원은 동일한 이유로 `--confirm-family-device` 플래그를 반드시 요구합니다. 저수준
-`program-slot`, `program-led`, `restore-backup` 명령의 전체 인자는 `macropad-probe help`로
+`program-slot`, `program-led`, `restore-backup` 명령의 전체 인자는 `keynob-probe help`로
 확인할 수 있습니다. 모든 쓰기 명령도 실행 직전에 전체 백업을 만듭니다.
 
 `self-test`는 하드웨어를 변경하지 않고 요청 바이트, 장치 선택, 보고서 검증, 단축키 왕복,
@@ -163,7 +167,7 @@ CLI 복원은 동일한 이유로 `--confirm-family-device` 플래그를 반드�
 로컬 Swift 컴파일러와 SDK 버전이 맞지 않으면 `swift test` 자체가 시작되지 않을 수 있으므로
 Xcode/Command Line Tools 버전을 맞춰야 합니다.
 Command Line Tools에 XCTest 모듈이 없을 때만 단위 테스트 생략을 명시합니다. 전체 Xcode가
-있는 환경에서는 `MACROPAD_REQUIRE_XCTEST=1 ./scripts/test-macos.sh`로 생략을 금지할 수 있습니다.
+있는 환경에서는 `KEYNOB_REQUIRE_XCTEST=1 ./scripts/test-macos.sh`로 생략을 금지할 수 있습니다.
 GitHub Actions는 Apple Silicon·Intel 러너에서 이 전체 시험과 Universal 앱 빌드를 수행합니다.
 
 ## 검증 범위
@@ -177,7 +181,7 @@ beta.2의 USB 검증은 macOS 26.5.1 Apple Silicon에서 수행했습니다. USB
 권한 검사와 라우터 활성 상태가 정상인데도 입력되지 않았으나, 매크로패드의 `Modify events`만 끈 뒤
 설치된 대상 앱의 입력칸에 `/model`이 입력되는 것을 사용자가 실물 키로 확인했습니다.
 
-같은 환경의 ChatGPT/Codex 데스크톱 앱 `26.903.71938`에서는 `Layer 1 / KNOB 1 / ChatGPT에서만`의 CCW(반시계 방향) `추론 수준 낮추기`와 CW(시계 방향) `추론 수준 높이기`도 사용자가 실물로 확인했습니다. 고정 단축키 대신 대상 앱의 등록된 단축키를 읽도록 수정한 앱으로 교체하고, 새 실행 파일의 손쉬운 사용 권한을 다시 등록한 뒤 양방향 동작을 확인했습니다. 대상 앱의 단축키 파일, MacroPad의 키 설정과 Karabiner 제외 설정은 변경하지 않았습니다.
+같은 환경의 ChatGPT/Codex 데스크톱 앱 `26.903.71938`에서는 `Layer 1 / KNOB 1 / ChatGPT에서만`의 CCW(반시계 방향) `추론 수준 낮추기`와 CW(시계 방향) `추론 수준 높이기`도 사용자가 실물로 확인했습니다. 고정 단축키 대신 대상 앱의 등록된 단축키를 읽도록 수정한 앱으로 교체하고, 새 실행 파일의 손쉬운 사용 권한을 다시 등록한 뒤 양방향 동작을 확인했습니다. 대상 앱의 단축키 파일, Keynob의 키 설정과 Karabiner 제외 설정은 변경하지 않았습니다.
 
 이 실물 결과는 한 장치의 KEY 1 텍스트 입력과 KNOB 1 양방향 추론 수준 조절에 한정됩니다. KNOB 1 누르기의 `Medium`, KNOB 2, 다른 레이어, 비대상 앱에서의 차단과 전용 CLI 동작까지 통과했다는 뜻은 아닙니다.
 
@@ -195,8 +199,8 @@ beta.2의 USB 검증은 macOS 26.5.1 Apple Silicon에서 수행했습니다. USB
 ## 구조
 
 - `Sources/CHIDBridge`: IOKit 기반 정확 장치 선택 및 트랜잭션 쓰기·검증·원복
-- `Sources/MacroPadCore`: 프로토콜, 단축키 코덱, 백업과 구성 서비스
-- `Sources/MacroPadProbe`: 읽기, 백업, 복원과 실물 진단 JSON CLI
-- `Sources/MacroPadStatusHook`: 내용 최소화 Codex 훅 클라이언트
-- `Sources/MacroPadStudioMac`: SwiftUI 설정 앱, 입력 라우터, 전용 실행기와 상태 수신기
-- `Tests/MacroPadCoreTests`: 하드웨어가 필요 없는 프로토콜·백업 단위 테스트
+- `Sources/KeynobCore`: 프로토콜, 단축키 코덱, 백업과 구성 서비스
+- `Sources/KeynobProbe`: 읽기, 백업, 복원과 실물 진단 JSON CLI
+- `Sources/KeynobStatusHook`: 내용 최소화 Codex 훅 클라이언트
+- `Sources/Keynob`: SwiftUI 설정 앱, 입력 라우터, 전용 실행기와 상태 수신기
+- `Tests/KeynobCoreTests`: 하드웨어가 필요 없는 프로토콜·백업 단위 테스트

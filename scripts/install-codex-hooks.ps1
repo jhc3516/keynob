@@ -101,5 +101,5 @@ $ourHandlers = @(
 )
 Write-Output "CODEX_HOOKS_OK installed=$(-not $Uninstall) handlers=$($ourHandlers.Count) path=$hooksPath"
 if (-not $Uninstall) {
-    Write-Output 'CODEX_HOOKS_NEXT_ACTION Open a new interactive Codex CLI, enter /hooks, review the seven MacroPad Studio hooks, and trust them.'
+    Write-Output 'CODEX_HOOKS_NEXT_ACTION Open a new interactive Codex CLI, enter /hooks, review the seven Keynob hooks, and trust them.'
 }

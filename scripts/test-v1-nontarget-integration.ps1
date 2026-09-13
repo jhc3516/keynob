@@ -10,7 +10,7 @@ $physicalTest = Join-Path $root 'artifacts\portable\Test-V1PhysicalInput.ps1'
 $form = $null
 $originalNoHardwareWrites = $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES
 
-if (@(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue).Count -ne 0) {
+if (@(Get-Process Keynob -ErrorAction SilentlyContinue).Count -ne 0) {
     throw 'Stop Codex Keyboard Studio before this no-write integration test.'
 }
 $env:CODEX_KEYBOARD_TEST_NO_HARDWARE_WRITES = '1'

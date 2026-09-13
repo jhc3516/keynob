@@ -19,7 +19,7 @@ License references:
 
 ## HIDAPI 0.15.0
 
-MacroPad Studio distributes the official x86 Windows `hidapi.dll` from
+Keynob distributes the official x86 Windows `hidapi.dll` from
 `hidapi-win.zip` under HIDAPI's BSD-style license.
 
 - Project: https://github.com/libusb/hidapi

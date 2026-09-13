@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dotnet = 'C:\Program Files\dotnet\dotnet.exe'
 $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
-$appProject = Join-Path $root 'src\CodexKeyboardStudio\CodexKeyboardStudio.csproj'
+$appProject = Join-Path $root 'src\Keynob\Keynob.csproj'
 $nugetConfig = Join-Path $root 'NuGet.Config'
 $bridgeSource = Join-Path $root 'src\KeyboardDeviceBridge\KeyboardDeviceBridge.cpp'
 $hookClientSource = Join-Path $root 'src\CodexStatusHookClient\CodexStatusHookClient.cpp'
@@ -71,7 +71,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Copy-Item -LiteralPath $hidapiDll -Destination (Join-Path $artifactDir 'hidapi.dll') -Force
-Copy-Item -LiteralPath (Join-Path $root 'assets\codex-keyboard.ico') -Destination (Join-Path $artifactDir 'codex-keyboard.ico') -Force
+Copy-Item -LiteralPath (Join-Path $root 'assets\keynob.ico') -Destination (Join-Path $artifactDir 'keynob.ico') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install-codex-hooks.ps1') -Destination (Join-Path $artifactDir 'Install-CodexHooks.ps1') -Force
 
 Write-Output "V1_BUILD_PASS app=$artifactDir"

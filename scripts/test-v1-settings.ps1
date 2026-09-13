@@ -4,7 +4,7 @@ param()
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dotnet = 'C:\Program Files\dotnet\dotnet.exe'
-$project = Join-Path $root 'tests\CodexKeyboardStudio.SettingsTests\CodexKeyboardStudio.SettingsTests.csproj'
+$project = Join-Path $root 'tests\Keynob.SettingsTests\Keynob.SettingsTests.csproj'
 $nugetConfig = Join-Path $root 'NuGet.Config'
 $dotnetAppData = Join-Path $root '.runtime\dotnet-appdata'
 $nugetPackages = Join-Path $root '.runtime\nuget-packages'

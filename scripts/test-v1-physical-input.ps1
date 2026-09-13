@@ -15,8 +15,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$siblingApp = Join-Path $PSScriptRoot 'CodexKeyboardStudio.exe'
-$repoApp = Join-Path $root 'artifacts\portable\CodexKeyboardStudio.exe'
+$siblingApp = Join-Path $PSScriptRoot 'Keynob.exe'
+$repoApp = Join-Path $root 'artifacts\portable\Keynob.exe'
 $app = if (Test-Path -LiteralPath $siblingApp) { $siblingApp } else { $repoApp }
 if (-not (Test-Path -LiteralPath $app)) {
     throw 'Codex Keyboard Studio portable app is missing.'
@@ -26,11 +26,11 @@ if ($ValidateOnly) {
     exit 0
 }
 
-$processes = @(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue)
+$processes = @(Get-Process Keynob -ErrorAction SilentlyContinue)
 if ($processes.Count -eq 0) {
     Start-Process -FilePath $app -ArgumentList '--background' -WorkingDirectory (Split-Path -Parent $app) -WindowStyle Hidden
     Start-Sleep -Milliseconds 700
-    $processes = @(Get-Process CodexKeyboardStudio -ErrorAction SilentlyContinue)
+    $processes = @(Get-Process Keynob -ErrorAction SilentlyContinue)
 }
 if ($processes.Count -ne 1) {
     throw "Expected one Codex Keyboard Studio process, found $($processes.Count)."

@@ -173,7 +173,7 @@ public static class CodexCancellationRoutingProbe {
     $instanceA = [Guid]::NewGuid().ToString('N')
     $instanceB = [Guid]::NewGuid().ToString('N')
     $form = [System.Windows.Forms.Form]::new()
-    $form.Text = "Codex CLI - MacroPad Studio - $instanceA"
+    $form.Text = "Codex CLI - Keynob - $instanceA"
     $form.Width = 480
     $form.Height = 160
     $form.Show()
@@ -217,7 +217,7 @@ public static class CodexCancellationRoutingProbe {
     }
 
     $instanceC = [Guid]::NewGuid().ToString('N')
-    $form.Text = "Codex CLI - MacroPad Studio - $instanceC"
+    $form.Text = "Codex CLI - Keynob - $instanceC"
     [System.Windows.Forms.Application]::DoEvents()
     $stopFirstBaseline = @(Get-Content -LiteralPath $logPath -Encoding UTF8).Count
     Send-HookEvent $instanceC '{"hook_event_name":"UserPromptSubmit","session_id":"stop-first-session","turn_id":"stop-first-turn"}'
@@ -241,7 +241,7 @@ public static class CodexCancellationRoutingProbe {
     }
 
     $instanceD = [Guid]::NewGuid().ToString('N')
-    $form.Text = "Codex CLI - MacroPad Studio - $instanceD"
+    $form.Text = "Codex CLI - Keynob - $instanceD"
     [System.Windows.Forms.Application]::DoEvents()
     $raceBaseline = @(Get-Content -LiteralPath $logPath -Encoding UTF8).Count
     Send-HookEvent $instanceD '{"hook_event_name":"UserPromptSubmit","session_id":"race-route-session","turn_id":"race-old-turn"}'
@@ -278,7 +278,7 @@ public static class CodexCancellationRoutingProbe {
     [CodexCancellationRoutingProbe]::SendEscape()
     Wait-ForLogMatch 'codex_cancel_title_wait\s+gesture=escape' $deferredCancelBaseline
     Start-Sleep -Milliseconds 250
-    $form.Text = "Codex CLI - MacroPad Studio - $instanceE"
+    $form.Text = "Codex CLI - Keynob - $instanceE"
     [System.Windows.Forms.Application]::DoEvents()
     Wait-ForLogMatch "codex_cancel_gesture\s+key=escape;instance=$instanceE;resolution=title_restored" $deferredCancelBaseline 2500
     Wait-ForLogMatch "codex_cancel_pending\s+gesture=escape;instance=$instanceE;session=deferred-session;turn=deferred-turn" $deferredCancelBaseline 2500
@@ -302,7 +302,7 @@ public static class CodexCancellationRoutingProbe {
     [CodexCancellationRoutingProbe]::SendEscape()
     Wait-ForLogMatch 'codex_cancel_title_wait\s+gesture=escape' $foregroundCancelBaseline
     Focus-TestForm $otherForm
-    $form.Text = "Codex CLI - MacroPad Studio - $instanceF"
+    $form.Text = "Codex CLI - Keynob - $instanceF"
     [System.Windows.Forms.Application]::DoEvents()
     Wait-ForLogMatch 'codex_cancel_title_unresolved\s+gesture=escape;reason=foreground_changed' $foregroundCancelBaseline
     $wrongCancellation = @(

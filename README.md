@@ -1,14 +1,24 @@
-# MacroPad Studio
+# Keynob
 
-12키·2노브 매크로패드를 위한 오픈 소스 도구입니다. Windows판과 macOS판 모두 세 레이어,
-앱별 키 동작, LED 설정과 선택적인 Codex CLI 상태 표시를 제공합니다. macOS판은 실험 단계이며
-Typeless 범위를 제외합니다. OS별 키 지원과 검증 범위는 아래 안내를 확인하세요.
+**AI 도구를 손끝에서.**
 
-`v1.0.0-beta.2`는 macOS 소스를 추가한 릴리스입니다. Windows 실행 파일은 기존
-[v1.0.0-beta.1](https://github.com/jhc3516/macropad-studio/releases/tag/v1.0.0-beta.1)을
-계속 사용합니다. [beta.2 변경 및 검증 범위](docs/release-notes-v1.0.0-beta.2.md)
+A macro keypad companion for ChatGPT and Codex CLI, for Windows and macOS.
 
-![MacroPad Studio 화면](assets/macropad-studio.jpg)
+Keynob는 12키·2노브 매크로패드로 ChatGPT 앱과 Codex CLI를 활용하는 오픈 소스 앱입니다.
+키와 노브에 앱별 단축키·텍스트·내장 동작을 연결하고, 선택적인 Codex CLI 상태 연동으로
+작업 진행·승인 대기·완료·오류를 LED에서 확인합니다. 일반 단축키, 세 레이어와 LED 설정도 제공합니다.
+macOS에서는 대상 앱에 등록된 단축키를 통해 추론 수준을 조절할 수 있습니다.
+운영체제별 지원 범위와 실물 검증 결과는 아래 안내를 확인하세요.
+
+이 프로젝트의 이전 이름은 **MacroPad Studio**입니다. 현재 소스와 이후 빌드의 이름은 Keynob이며,
+기존 배포 파일과 과거 릴리스 기록은 당시 이름을 유지합니다.
+`v1.0.0-beta.2`는 macOS 소스를 추가한 릴리스입니다. Windows 배포본은
+[v1.0.0-beta.1](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.1)을 사용합니다.
+[beta.2 변경 및 검증 범위](docs/release-notes-v1.0.0-beta.2.md)
+
+![이전 MacroPad Studio Windows 화면](assets/keynob.jpg)
+
+위 이미지는 이름 변경 전 Windows 화면입니다.
 
 ## 지원 범위
 
@@ -29,7 +39,7 @@ Typeless 범위를 제외합니다. OS별 키 지원과 검증 범위는 아래 
 
 1. GitHub Releases에서 `MacroPadStudio-v1.0.0-beta.1-win-x64.zip`을 받습니다.
 2. 원하는 폴더에 압축을 풉니다.
-3. `CodexKeyboardStudio.exe`를 실행합니다. 이 파일명은 첫 베타의 내부 호환 이름이며 화면에는 MacroPad Studio로 표시됩니다.
+3. 기존 beta.1 배포본에서는 `CodexKeyboardStudio.exe`를 실행합니다. 화면에는 이전 이름인 MacroPad Studio가 표시됩니다. 현재 소스를 빌드하면 `Keynob.exe`가 생성됩니다.
 4. 레이어와 키·노브 동작을 편집한 뒤 `변경 내용 적용`을 누릅니다.
 
 적용 직전에 현재 레이어 25슬롯과 LED 상태가
@@ -79,9 +89,9 @@ macOS 포트는 Swift 6과 macOS 시스템 프레임워크만 사용합니다. X
 버전이 맞는 Xcode Command Line Tools가 필요하며, 추가 패키지를 설치하지 않습니다.
 
 ```bash
-swift run --package-path macos macropad-probe self-test
-swift run --package-path macos macropad-probe discover
-swift run --package-path macos MacroPadStudioMac
+swift run --package-path macos keynob-probe self-test
+swift run --package-path macos keynob-probe discover
+swift run --package-path macos Keynob
 ```
 
 `.app` 번들은 `./scripts/build-macos-app.sh`로 만들 수 있습니다. macOS판은 적용 전에 세 레이어
@@ -98,9 +108,25 @@ Karabiner-Elements는 필수 구성요소가 아닙니다. 함께 사용한다�
 정리되어 있습니다. macOS 13 실기기와 Intel USB 장치 검증은 아직 남아 있습니다.
 공증된 Mac 실행 파일은 배포하지 않으며, Mac 사용자는 소스에서 로컬 앱을 빌드합니다.
 
+## 이전 버전에서 업그레이드
+
+앱 이름·소스 모듈·실행 파일은 Keynob로 변경했습니다. 기존 설정·백업을 그대로 읽고 훅 중복 설치를
+피하기 위해 다음 호환 식별자는 유지합니다. 폴더를 수동으로 옮길 필요가 없습니다.
+
+- Windows 데이터 폴더: `%LocalAppData%\CodexKeyboardStudio`
+- macOS 데이터 폴더: `~/Library/Application Support/MacroPad Studio`
+- macOS 번들 ID: `io.github.jhc3516.macropad-studio.macos`
+- 설치된 macOS 훅 경로: `~/.codex/macropad-status-hook` (번들 내 파일명은 `keynob-status-hook`)
+- 기존 Windows 상태 파이프·단일 실행 식별자·시작 프로그램 등록 키와 `CODEX_KEYBOARD_*` 환경변수
+
+이전 앱과 전용 CLI 창을 종료한 뒤 Keynob를 실행하고 전용 CLI 창을 새로 여세요.
+Windows 시작 프로그램을 사용했다면 Keynob에서 해당 옵션을 다시 켜 새 실행 파일 경로로 등록하세요.
+macOS는 로컬 서명이 바뀌므로 손쉬운 사용 권한을 다시 등록해야 할 수 있습니다.
+기존 앱은 새 Keynob가 동작하는 것을 확인한 뒤 제거할 수 있습니다.
+
 ## 라이선스
 
-MacroPad Studio 소스는 [MIT License](LICENSE)로 제공됩니다. 이는 사용·복사·수정·배포·상업적
+Keynob 소스는 [MIT License](LICENSE)로 제공됩니다. 이는 사용·복사·수정·배포·상업적
 이용을 폭넓게 허용하지만 저작권 및 허가 고지를 유지해야 하고, 보증이나 손해배상 책임을 제공하지
 않는다는 뜻입니다. self-contained 패키지에 포함된 .NET·WPF·Windows SDK 구성요소와 HIDAPI에는
 별도 조건과 고지가 적용됩니다. 배포물의 `DOTNET-*`, `WPF-*`, `WINDOWS-SDK-LICENSE.rtf` 및

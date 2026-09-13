@@ -3,15 +3,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "MacroPadStudioMac",
+    name: "Keynob",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .library(name: "MacroPadCore", targets: ["MacroPadCore"]),
-        .executable(name: "macropad-probe", targets: ["MacroPadProbe"]),
-        .executable(name: "macropad-status-hook", targets: ["MacroPadStatusHook"]),
-        .executable(name: "MacroPadStudioMac", targets: ["MacroPadStudioMac"])
+        .library(name: "KeynobCore", targets: ["KeynobCore"]),
+        .executable(name: "keynob-probe", targets: ["KeynobProbe"]),
+        .executable(name: "keynob-status-hook", targets: ["KeynobStatusHook"]),
+        .executable(name: "Keynob", targets: ["Keynob"])
     ],
     targets: [
         .target(
@@ -23,23 +23,23 @@ let package = Package(
             ]
         ),
         .target(
-            name: "MacroPadCore",
+            name: "KeynobCore",
             dependencies: ["CHIDBridge"]
         ),
         .executableTarget(
-            name: "MacroPadProbe",
-            dependencies: ["MacroPadCore"]
+            name: "KeynobProbe",
+            dependencies: ["KeynobCore"]
         ),
         .executableTarget(
-            name: "MacroPadStatusHook"
+            name: "KeynobStatusHook"
         ),
         .executableTarget(
-            name: "MacroPadStudioMac",
-            dependencies: ["MacroPadCore"]
+            name: "Keynob",
+            dependencies: ["KeynobCore"]
         ),
         .testTarget(
-            name: "MacroPadCoreTests",
-            dependencies: ["MacroPadCore"]
+            name: "KeynobCoreTests",
+            dependencies: ["KeynobCore"]
         )
     ]
 )

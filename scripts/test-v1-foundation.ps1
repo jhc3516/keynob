@@ -4,7 +4,7 @@ param()
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $appDir = Join-Path $root 'artifacts\app'
-$app = Join-Path $appDir 'CodexKeyboardStudio.exe'
+$app = Join-Path $appDir 'Keynob.exe'
 $bridge = Join-Path $appDir 'KeyboardDeviceBridge.exe'
 $hid = Join-Path $appDir 'hidapi.dll'
 

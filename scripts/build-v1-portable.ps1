@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $dotnet = 'C:\Program Files\dotnet\dotnet.exe'
-$appProject = Join-Path $root 'src\CodexKeyboardStudio\CodexKeyboardStudio.csproj'
+$appProject = Join-Path $root 'src\Keynob\Keynob.csproj'
 $nugetConfig = Join-Path $root 'NuGet.Portable.Config'
 $frameworkBuild = Join-Path $root 'scripts\build-v1-app.ps1'
 $frameworkArtifacts = Join-Path $root 'artifacts\app'
@@ -33,7 +33,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Self-contained publish failed with exit code $LASTEXITCODE"
 }
 
-foreach ($fileName in @('KeyboardDeviceBridge.exe', 'CodexStatusHookClient.exe', 'Start-CodexCli.exe', 'hidapi.dll', 'codex-keyboard.ico')) {
+foreach ($fileName in @('KeyboardDeviceBridge.exe', 'CodexStatusHookClient.exe', 'Start-CodexCli.exe', 'hidapi.dll', 'keynob.ico')) {
     Copy-Item -LiteralPath (Join-Path $frameworkArtifacts $fileName) -Destination (Join-Path $portableDir $fileName) -Force
 }
 foreach ($fileName in @(
@@ -77,7 +77,7 @@ foreach ($fileName in @(
 Get-ChildItem -LiteralPath $portableDir -Filter '*.pdb' -File -Recurse | Remove-Item -Force
 
 $required = @(
-    'CodexKeyboardStudio.exe', 'CodexKeyboardStudio.dll', 'KeyboardDeviceBridge.exe',
+    'Keynob.exe', 'Keynob.dll', 'KeyboardDeviceBridge.exe',
     'CodexStatusHookClient.exe', 'Start-CodexCli.exe', 'hidapi.dll', 'coreclr.dll', 'hostfxr.dll',
     'PresentationFramework.dll', 'Install-CodexHooks.ps1', 'set-codex-cli-status.ps1',
     'Run-CodexExecWithStatus.ps1', 'codex-json-status.ps1',
