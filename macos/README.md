@@ -39,6 +39,29 @@ MacroPad Studio가 이를 가로채 정확한 전경 앱을 다시 확인한 뒤
 `~/Library/Application Support/MacroPad Studio/settings.json`에 권한 `0600`의 평문으로
 저장되므로 암호·토큰 같은 비밀은 넣지 마세요.
 
+## Karabiner-Elements 사용 시
+
+Karabiner-Elements는 MacroPad Studio의 필수 구성요소가 아닙니다. 설치되어 있다면 매크로패드만
+Karabiner 입력 처리에서 제외하는 것을 권장합니다. 손쉬운 사용 권한이 허용되고 라우터가 실행 중이어도,
+Karabiner가 장치 입력을 함께 처리하면 앱별 동작이 실행되지 않을 수 있습니다.
+
+1. Karabiner-Elements의 `Devices` 탭을 엽니다.
+2. 매크로패드의 **VID `20812` (`0x514C`), PID `34896` (`0x8850`)**를 확인합니다.
+   장치 이름은 `USB Composite Device`로 표시될 수 있으므로 이름만으로 선택하지 마세요.
+3. 해당 장치의 `Modify events`만 끕니다. 다른 키보드의 설정은 변경하지 않으며,
+   Karabiner 전체를 종료하거나 삭제할 필요도 없습니다.
+4. MacroPad Studio에서 `새로 고침` 후 입력 라우터를 시작하고, 대상 앱의 빈 입력칸에서 실물 키를
+   다시 테스트합니다. 이미 라우터가 실행 중이면 그대로 테스트할 수 있습니다.
+
+이 설정은 현재 Karabiner 프로필에 저장됩니다. 프로필을 바꾸면 매크로패드의 제외 상태도 다시
+확인하세요. 장치에 저장한 키·LED 설정은 바뀌지 않지만, 해당 매크로패드에 적용하던 Karabiner 변환은
+사용하지 않게 됩니다. [Karabiner 공식 장치 선택 안내](https://karabiner-elements.pqrs.org/docs/manual/configuration/configure-devices/)
+
+Layer 1의 KEY 1은 앱별 라우팅에 `Control+Shift+Option+F1` 별칭을 사용합니다. Karabiner와 macOS의
+기능 키 설정에 따라 F1~F12가 밝기·음량 같은 미디어 키로 처리될 수 있습니다.
+[Karabiner 공식 기능 키 설명](https://karabiner-elements.pqrs.org/docs/help/how-to/function-keys/)
+이는 입력 실패의 가능한 경로이며, 아래 실물 시험에서 실제로 어떤 키로 변환됐는지까지 확인한 것은 아닙니다.
+
 ## Codex 상태 LED
 
 `앱 · Codex` 탭의 `설치 / 복구`는 사용자가 눌렀을 때만 기존 `~/.codex/hooks.json`을 백업하고
@@ -125,13 +148,20 @@ Command Line Tools에 XCTest 모듈이 없을 때만 단위 테스트 생략을 
 있는 환경에서는 `MACROPAD_REQUIRE_XCTEST=1 ./scripts/test-macos.sh`로 생략을 금지할 수 있습니다.
 GitHub Actions는 Apple Silicon·Intel 러너에서 이 전체 시험과 Universal 앱 빌드를 수행합니다.
 
-## beta.2 검증 범위
+## 검증 범위
 
-macOS 26.5.1 Apple Silicon에서 USB 인식, 라우팅 별칭 슬롯 임시 기록·원복, LED 임시 기록·원복을
-실물로 점검했고, 전후 75슬롯과 LED 전체 상태가 동일함을 확인했습니다. 자동 시험과 Universal
+beta.2의 USB 검증은 macOS 26.5.1 Apple Silicon에서 수행했습니다. USB 인식과 라우팅 별칭 슬롯·LED의
+임시 기록·원복을 실물로 점검했고, 전후 75슬롯과 LED 전체 상태가 동일함을 확인했습니다. 자동 시험과 Universal
 빌드는 실물의 모든 키·노브 조작이나 다른 OS 버전에서의 실행을 대신하지 않습니다.
 
-최종 수동 점검은 다음 순서로 수행하세요.
+2026-09-13에는 macOS 26.6.2 Apple Silicon과 Karabiner-Elements 16.3.0 환경에서
+`Layer 1 / KEY 1 / ChatGPT에서만 / 텍스트 입력 /model`을 추가로 확인했습니다. 손쉬운 사용·입력 전송
+권한 검사와 라우터 활성 상태가 정상인데도 입력되지 않았으나, 매크로패드의 `Modify events`만 끈 뒤
+설치된 대상 앱의 입력칸에 `/model`이 입력되는 것을 사용자가 실물 키로 확인했습니다.
+이 결과는 한 장치·한 키·한 텍스트 동작에 한정되며, 비대상 앱에서의 차단이나 다른 키·노브·전용 CLI
+동작까지 통과했다는 뜻은 아닙니다.
+
+전체 수동 점검은 다음 순서로 수행하세요.
 
 1. 앱에서 4×3 키와 Knob 1·2를 선택하고 시계 방향·반시계 방향·누르기 구분을 확인합니다.
 2. 백업을 만든 뒤 전역 단축키를 적용하고 실제 키·노브 입력, LED 적용 및 백업 복원을 확인합니다.
@@ -139,8 +169,8 @@ macOS 26.5.1 Apple Silicon에서 USB 인식, 라우팅 별칭 슬롯 임시 기�
 4. 전용 실행기로 연 Codex CLI 창과 일반 Terminal 창을 번갈아 선택하여 입력 범위를 확인합니다.
 5. 선택적으로 훅을 설치하고 Codex CLI에서 신뢰한 뒤 실행·승인·완료·오류 LED를 확인합니다.
 
-현재 배포 전 재점검에서는 잠긴 화면 때문에 1~5의 실제 UI·전경 앱 입력 흐름을 끝까지 실행하지
-못했습니다. macOS 13 실기기와 Intel USB 장치 검증도 남아 있으므로 안정판 호환성을 보증하지 않습니다.
+위 1~5의 전체 흐름은 아직 최종 검증을 완료하지 않았습니다. macOS 13 실기기와 Intel USB 장치
+검증도 남아 있으므로 안정판 호환성을 보증하지 않습니다.
 
 ## 구조
 

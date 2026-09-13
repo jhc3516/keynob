@@ -90,8 +90,12 @@ ChatGPT·Codex CLI 범위는 macOS 손쉬운 사용 권한과 실행 중인 앱�
 앱의 전용 Terminal 실행기로 연 창에만 전달됩니다. 상세한 범위와 권한·훅 설정, CLI 명령은
 [macOS 안내](macos/README.md)를 확인하세요.
 
-이번 릴리스의 실물 USB 점검은 macOS 26.5.1 Apple Silicon에서 수행했습니다. macOS 13 실기기와
-Intel USB 장치, 권한을 부여한 뒤 실제 전경 앱으로 전달되는 입력은 최종 검증이 남아 있습니다.
+Karabiner-Elements는 필수 구성요소가 아닙니다. 함께 사용한다면 입력 충돌을 피하도록
+매크로패드만 Karabiner 처리 대상에서 제외하세요. 다른 키보드 설정은 유지할 수 있습니다.
+[장치별 제외 방법과 입력 실패 증상](macos/README.md#karabiner-elements-사용-시)
+
+실물 USB 점검 결과와 앱별 입력의 확인·미검증 항목은 [macOS 검증 범위](macos/README.md#검증-범위)에
+정리되어 있습니다. macOS 13 실기기와 Intel USB 장치 검증은 아직 남아 있습니다.
 공증된 Mac 실행 파일은 배포하지 않으며, Mac 사용자는 소스에서 로컬 앱을 빌드합니다.
 
 ## 라이선스
