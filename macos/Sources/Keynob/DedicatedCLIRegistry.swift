@@ -16,6 +16,12 @@ final class DedicatedCLIRegistry: @unchecked Sendable {
         DispatchQueue.main.async { [weak self] in self?.startPollingIfNeeded() }
     }
 
+    func instanceID(forWindowTitle title: String) -> String? {
+        lock.withLock {
+            AppTargetPolicy.registeredInstanceID(fromTerminalWindowTitle: title, registeredIDs: instanceIDs)
+        }
+    }
+
     func contains(instanceID: String) -> Bool {
         lock.withLock { instanceIDs.contains(instanceID) }
     }

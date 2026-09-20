@@ -44,6 +44,55 @@ private func makeSnapshot() throws -> FullDeviceSnapshot {
 private func runSelfTest() throws -> SelfTestSummary {
     var passed = 0
     func check(_ condition: @autoclosure () -> Bool, _ name: String) throws { try require(condition(), name); passed += 1 }
+
+    // Recorder regression checks run even when this toolchain has no XCTest.
+    var capture = ShortcutCapture()
+    let allModifiers: Set<UInt8> = [0xF1, 0xF2, 0xF3, 0xF4]
+    try check(capture.update(modifiers: allModifiers) == nil, "capture_modifiers_wait")
+    try check(capture.update(keyCode: 40, down: true, modifiers: allModifiers) == nil, "capture_key_wait")
+    try check(capture.update(keyCode: 40, down: true, modifiers: allModifiers) == nil, "capture_repeat")
+    let fiveKeyChord = try capture.update(keyCode: 40, modifiers: allModifiers)?.get()
+    try check(capture.update(modifiers: []) == nil, "capture_ignores_remaining_releases")
+    try check(fiveKeyChord == DeviceShortcut(modifierCodes: allModifiers, keyCode: 0x0E), "capture_five_keys")
+    capture = ShortcutCapture()
+    _ = capture.update(modifiers: [0xF4])
+    let modifierOnly = try capture.update(modifiers: [])?.get()
+    try check(modifierOnly == DeviceShortcut(modifierCodes: [0xF4]), "capture_modifier_only")
+    capture = ShortcutCapture()
+    _ = capture.update(keyCode: 53, down: true, modifiers: [])
+    let escape = try capture.update(keyCode: 53, modifiers: [])?.get()
+    try check(escape?.keyCode == 0x29, "capture_escape_is_key")
+    capture = ShortcutCapture()
+    _ = capture.update(keyCode: 0, down: true, modifiers: [0xF4])
+    _ = capture.update(keyCode: 11, down: true, modifiers: [0xF4])
+    if case .failure(.multipleKeys) = capture.update(keyCode: 0, modifiers: [0xF4]) {
+        passed += 1
+    } else { throw SelfTestFailure(check: "capture_multiple_regular_keys_rejected") }
+    capture = ShortcutCapture()
+    _ = capture.update(keyCode: 255, down: true, modifiers: [])
+    if case .failure(.unsupportedKey) = capture.update(keyCode: 255, modifiers: []) {
+        passed += 1
+    } else { throw SelfTestFailure(check: "capture_unsupported_key_rejected") }
+    capture = ShortcutCapture()
+    _ = capture.update(keyCode: 76, down: true, modifiers: [])
+    let keypadEnter = try capture.update(keyCode: 76, modifiers: [])?.get()
+    try check(keypadEnter?.keyCode == 0x28, "capture_keypad_enter")
+    capture = ShortcutCapture()
+    _ = capture.update(keyCode: 0, down: true, modifiers: [0xF2])
+    let modifierReleasedFirst = try capture.update(modifiers: [])?.get()
+    try check(modifierReleasedFirst == DeviceShortcut(modifierCodes: [0xF2], keyCode: 0x04), "capture_modifier_released_first")
+    capture = ShortcutCapture()
+    _ = capture.update(modifiers: [0xF2, 0xF4])
+    let partialRelease = try capture.update(modifiers: [0xF4])?.get()
+    try check(partialRelease == DeviceShortcut(modifierCodes: [0xF2, 0xF4]), "capture_first_of_multiple_modifiers")
+    capture = ShortcutCapture()
+    _ = capture.update(modifiers: [0xF2])
+    let sideRelease = try capture.update(modifiers: [0xF2], modifierReleased: true)?.get()
+    try check(sideRelease == DeviceShortcut(modifierCodes: [0xF2]), "capture_release_one_modifier_side")
+    for key in MacKeyCodeCatalog.regularKeys {
+        try check(MacKeyCodeCatalog.hidCode(virtualKeyCode: MacKeyCodeCatalog.cgKeyCode(hidCode: key.code)!) == key.code,
+                  "capture_key_mapping_\(key.id)")
+    }
     let layerRequest = [UInt8](try KeynobReportCodec.readLayerRequest(layer: 2))
     try check(layerRequest.count == 65 && Array(layerRequest.prefix(5)) == [0x03, 0xFA, 0x19, 0x00, 0x02], "layer_request")
     try check(Array([UInt8](KeynobReportCodec.readLEDRequest()).prefix(3)) == [0x03, 0xFA, 0xB0], "led_request")
@@ -106,6 +155,39 @@ private func runSelfTest() throws -> SelfTestSummary {
         "app_keymap_supported_alternative")
     try check(CodexAppKeybindings.commandID(for: "reasoning_medium") == nil,
         "reasoning_cycle_is_not_medium")
+    let desktopOverrides = Data("""
+    [{"command":"composer.openModelPicker","key":"Ctrl+Command+Alt+F18"},
+     {"command":"composer.cycleReasoningEffort","key":"Ctrl+Command+Alt+F16"},
+     {"command":"previousThread","key":"Command+F14"},
+     {"command":"searchChats","key":"Command+K"}]
+    """.utf8)
+    for (action, expected) in [
+        ("model_selector", "Ctrl+Command+Alt+F18"), ("reasoning_cycle", "Ctrl+Command+Alt+F16"),
+        ("previous_conversation", "Command+F14"), ("switch_chat", "Command+K")
+    ] {
+        let resolved = try CodexAppKeybindings.shortcut(for: action, data: desktopOverrides)
+        try check(resolved == CodexAppKeybindings.parseAccelerator(expected), "desktop_override_\(action)")
+    }
+    for (action, expected) in [
+        ("previous_conversation", "Command+Shift+["), ("next_conversation", "Command+Shift+]"),
+        ("model_selector", "Control+Shift+M"), ("settings", "Command+,")
+    ] {
+        let resolved = try CodexAppKeybindings.shortcut(for: action, data: Data("[]".utf8))
+        try check(resolved == CodexAppKeybindings.parseAccelerator(expected), "desktop_mac_default_\(action)")
+        let disabled = try JSONSerialization.data(withJSONObject: [["command": CodexAppKeybindings.commandID(for: action)!, "key": NSNull()]])
+        do {
+            _ = try CodexAppKeybindings.shortcut(for: action, data: disabled)
+            throw SelfTestFailure(check: "desktop_explicit_disable_\(action)")
+        } catch CodexAppKeybindingError.unassignedCommand { passed += 1 }
+    }
+    do {
+        _ = try CodexAppKeybindings.shortcut(for: "switch_chat", data: Data("[]".utf8))
+        throw SelfTestFailure(check: "search_requires_registered_shortcut")
+    } catch CodexAppKeybindingError.unassignedCommand { passed += 1 }
+    do {
+        _ = try CodexAppKeybindings.shortcut(for: "model_selector", data: Data("[{\"command\":\"composer.openModelPicker\",\"key\":\"Ctrl+F24\"}]".utf8))
+        throw SelfTestFailure(check: "model_picker_invalid_override_no_fallback")
+    } catch CodexAppKeybindingError.unsupportedShortcut { passed += 1 }
     let appF24 = RoutedBinding(scope: .chatGPT, actionKind: .shortcut, shortcut: DeviceShortcut(keyCode: 0x73))
     do {
         _ = try BindingCompiler.compile(appF24, layer: 1, input: EditableInput.all[0])
@@ -265,6 +347,30 @@ private func runSelfTest() throws -> SelfTestSummary {
               AppTargetPolicy.scope(bundleIdentifier: "com.apple.Terminal", focusedWindowTitle: "Codex CLI - Keynob [mac-test] extra") == nil &&
               AppTargetPolicy.scope(bundleIdentifier: "com.example.other", focusedWindowTitle: "Codex CLI - Keynob") == nil,
               "foreground_target_fail_closed")
+    let registeredCLIIDs: Set<String> = ["mac-test", "mac-second"]
+    for title in [
+        "Codex CLI - Keynob [mac-test]",
+        "Codex CLI - Keynob [mac-test] — codex — 80×24",
+        "project — Codex CLI - Keynob [mac-test] — zsh",
+        "Codex CLI - Keynob [mac-test] – /bin/zsh",
+        "project - Codex CLI - Keynob [mac-test] - 120x40"
+    ] {
+        try check(AppTargetPolicy.registeredInstanceID(fromTerminalWindowTitle: title,
+            registeredIDs: registeredCLIIDs) == "mac-test", "terminal_decorated_title")
+    }
+    for title in [
+        "zsh — 80×24", "Codex CLI - Keynob", "Codex CLI - Keynob [mac-other] — codex",
+        "Codex CLI - Keynob [mac-test] extra", "prefixCodex CLI - Keynob [mac-test]",
+        "Codex CLI - Keynob [mac-test]suffix", "Codex CLI - Keynob [mac-test", "Codex CLI - Keynob [mac-test/evil]",
+        "Codex CLI - Keynob [mac-test] — Codex CLI - Keynob [mac-second]"
+    ] {
+        try check(AppTargetPolicy.registeredInstanceID(fromTerminalWindowTitle: title,
+            registeredIDs: registeredCLIIDs) == nil, "terminal_title_rejects_unregistered_or_ambiguous")
+    }
+    try check(AppTargetPolicy.registeredInstanceID(fromTerminalWindowTitle: "Codex CLI - Keynob [mac-test] — codex",
+        registeredIDs: []) == nil, "terminal_title_rejects_previous_app_session")
+    try check(AppTargetPolicy.instanceID(fromDedicatedCLITitle: "Codex CLI - Keynob [mac-test] — codex") == nil,
+              "custom_title_parser_remains_exact")
     let hookCommand = "/Users/test/.codex/keynob-status-hook"
     let hookFixture = Data("""
     {"custom":{"keep":true},"hooks":{"SessionStart":[{"matcher":"keep","hooks":[{"type":"command","command":"other-helper","timeout":9}]}]}}

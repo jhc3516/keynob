@@ -55,7 +55,8 @@ public enum BuiltInActionCatalog {
         BuiltInAction(id: "enter", scope: .chatGPT, displayName: "Enter"),
         BuiltInAction(id: "reasoning_down", scope: .chatGPT, displayName: "추론 수준 낮추기"),
         BuiltInAction(id: "reasoning_up", scope: .chatGPT, displayName: "추론 수준 높이기"),
-        BuiltInAction(id: "reasoning_medium", scope: .chatGPT, displayName: "추론 수준 Medium"),
+        BuiltInAction(id: "reasoning_medium", scope: .chatGPT, displayName: "추론 수준 Medium (직접 지정 미지원)"),
+        BuiltInAction(id: "reasoning_cycle", scope: .chatGPT, displayName: "추론 수준 순환"),
         BuiltInAction(id: "model_menu_up", scope: .chatGPT, displayName: "모델 메뉴 위"),
         BuiltInAction(id: "model_menu_down", scope: .chatGPT, displayName: "모델 메뉴 아래"),
         BuiltInAction(id: "model_selector", scope: .chatGPT, displayName: "모델 선택기"),
@@ -400,6 +401,27 @@ public enum AppTargetPolicy {
         guard bundleIdentifier == terminalBundleIdentifier,
               focusedWindowTitle.flatMap(instanceID(fromDedicatedCLITitle:)) != nil else { return nil }
         return .codexCLI
+    }
+
+    /// AX exposes Terminal's composed window title, not just its custom tab title.
+    /// Accept one complete marker at title-segment boundaries, never an arbitrary substring.
+    public static func instanceID(fromTerminalWindowTitle title: String) -> String? {
+        let prefix = dedicatedCLITitlePrefix + " ["
+        guard let start = title.range(of: prefix),
+              let end = title[start.upperBound...].firstIndex(of: "]"),
+              title.range(of: prefix, range: start.upperBound..<title.endIndex) == nil else { return nil }
+        let before = String(title[..<start.lowerBound])
+        let after = String(title[title.index(after: end)...])
+        let separators = [" — ", " – ", " - "]
+        guard before.isEmpty || separators.contains(where: before.hasSuffix),
+              after.isEmpty || separators.contains(where: after.hasPrefix) else { return nil }
+        return instanceID(fromDedicatedCLITitle: String(title[start.lowerBound...end]))
+    }
+
+    public static func registeredInstanceID(fromTerminalWindowTitle title: String,
+                                            registeredIDs: Set<String>) -> String? {
+        guard let id = instanceID(fromTerminalWindowTitle: title), registeredIDs.contains(id) else { return nil }
+        return id
     }
 
     public static func instanceID(fromDedicatedCLITitle title: String) -> String? {

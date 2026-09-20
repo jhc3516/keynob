@@ -287,6 +287,7 @@ private struct ContentView: View {
     @State private var ledColors = Array(repeating: LEDPalette.colors[0].value, count: 12)
     @State private var status = "USB 장치를 연결한 뒤 새로 고침을 누르세요."
     @State private var isBusy = false
+    @State private var isRecordingShortcut = false
     @State private var isVisible = false
     @State private var showRestoreConfirmation = false
     @State private var runtimeLEDWriter = RuntimeLEDWriter()
@@ -325,6 +326,7 @@ private struct ContentView: View {
                 try? await runtimeLEDWriter.restore()
             }
         }
+        .onChange(of: isRecordingShortcut) { appRouting.setShortcutRecording($0) }
         .onChange(of: selectedLayer) { _ in loadBindingDraft() }
         .onChange(of: selectedInput) { _ in loadBindingDraft() }
         .onChange(of: binding.scope) { newScope in normalizeDraft(for: newScope) }
@@ -392,24 +394,26 @@ private struct ContentView: View {
             }.frame(minWidth: 540)
 
             GroupBox("\(selectedInput.label) · Layer \(selectedLayer)") {
-                VStack(alignment: .leading, spacing: 13) {
-                    Picker("범위", selection: $binding.scope) {
-                        ForEach(BindingScope.allCases) { Text($0.displayName).tag($0) }
-                    }.frame(maxWidth: 380)
-                    Picker("동작", selection: $binding.actionKind) {
-                        ForEach(availableActionKinds) { Text($0.displayName).tag($0) }
-                    }.pickerStyle(.segmented)
-                    Divider()
-                    actionEditor
-                    Spacer()
-                    Text(binding.scope == .global
-                         ? "전역 단축키는 매크로패드가 직접 실행하므로 앱이 꺼져도 동작합니다."
-                         : "앱별 동작은 손쉬운 사용 권한과 실행 중인 입력 라우터가 필요합니다.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    Button("이 입력에 적용") { applyBinding() }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(snapshot == nil || isBusy)
-                }.padding(8).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 13) {
+                        Picker("범위", selection: $binding.scope) {
+                            ForEach(BindingScope.allCases) { Text($0.displayName).tag($0) }
+                        }.frame(maxWidth: 380)
+                        Picker("동작", selection: $binding.actionKind) {
+                            ForEach(availableActionKinds) { Text($0.displayName).tag($0) }
+                        }.pickerStyle(.segmented)
+                        Divider()
+                        actionEditor
+                        Spacer()
+                        Text(binding.scope == .global
+                             ? "전역 단축키는 매크로패드가 직접 실행하므로 앱이 꺼져도 동작합니다."
+                             : "앱별 동작은 손쉬운 사용 권한과 실행 중인 입력 라우터가 필요합니다.")
+                            .font(.caption).foregroundStyle(.secondary)
+                        Button("이 입력에 적용") { applyBinding() }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(snapshot == nil || isBusy || isRecordingShortcut)
+                    }.padding(8).frame(maxWidth: .infinity, alignment: .topLeading)
+                }
             }
         }.padding(12)
     }
@@ -420,23 +424,27 @@ private struct ContentView: View {
         case .disabled:
             Label("이 입력을 비활성화합니다.", systemImage: "nosign").foregroundStyle(.secondary)
         case .shortcut:
-            Text("보조키").font(.headline)
-            HStack {
-                ForEach(DeviceKeyCatalog.modifiers) { modifier in
-                    Toggle(modifier.displayName, isOn: modifierBinding(modifier.code)).toggleStyle(.checkbox)
+            ShortcutRecorderView(shortcut: $binding.shortcut, isRecording: $isRecordingShortcut, scope: binding.scope)
+                .id("\(selectedLayer)-\(selectedInput.id)-\(binding.scope.rawValue)")
+            DisclosureGroup("직접 선택") {
+                Text("보조키").font(.headline)
+                HStack {
+                    ForEach(DeviceKeyCatalog.modifiers) { modifier in
+                        Toggle(modifier.displayName, isOn: modifierBinding(modifier.code)).toggleStyle(.checkbox)
+                    }
                 }
-            }
-            Text("키").font(.headline)
-            Picker("키", selection: regularKeyBinding) {
-                Text("보조키만 / 없음").tag(UInt16(0))
-                ForEach(availableRegularKeys) { key in
-                    Text("\(key.group) · \(key.displayName)").tag(UInt16(key.code))
-                }
-                if let code = binding.shortcut.keyCode, !availableRegularKeys.contains(where: { $0.code == code }) {
-                    Text("\(DeviceKeyCatalog.key(code: code)?.displayName ?? String(code)) · 이 범위에서 지원하지 않음")
-                        .tag(UInt16(code))
-                }
-            }.labelsHidden().frame(maxWidth: 360)
+                Text("키").font(.headline)
+                Picker("키", selection: regularKeyBinding) {
+                    Text("보조키만 / 없음").tag(UInt16(0))
+                    ForEach(availableRegularKeys) { key in
+                        Text("\(key.group) · \(key.displayName)").tag(UInt16(key.code))
+                    }
+                    if let code = binding.shortcut.keyCode, !availableRegularKeys.contains(where: { $0.code == code }) {
+                        Text("\(DeviceKeyCatalog.key(code: code)?.displayName ?? String(code)) · 이 범위에서 지원하지 않음")
+                            .tag(UInt16(code))
+                    }
+                }.labelsHidden().frame(maxWidth: 360)
+            }.disabled(isRecordingShortcut)
         case .text:
             TextEditor(text: $binding.text)
                 .font(.body.monospaced()).frame(minHeight: 150)
@@ -449,9 +457,13 @@ private struct ContentView: View {
                     Text(action.displayName).tag(Optional(action.id))
                 }
             }.frame(maxWidth: 400)
+            if binding.scope == .chatGPT, binding.builtInActionID == "reasoning_medium" {
+                Text("Medium을 정확히 지정하는 단축키는 확인되지 않았습니다. 추론 수준 순환 또는 모델 선택기에서 직접 선택하세요.")
+                    .font(.caption).foregroundStyle(.orange)
+            }
             if binding.scope == .chatGPT,
                let id = binding.builtInActionID, CodexAppKeybindings.commandID(for: id) != nil {
-                Text("대상 ChatGPT/Codex 앱에 등록된 추론 수준 단축키를 읽어 사용합니다. 대상 앱의 설정 › 키보드 단축키에 낮추기·높이기가 등록되어 있어야 합니다.")
+                Text("대상 데스크톱 앱의 등록된 단축키를 우선 사용합니다. 대화 이동·모델 선택·설정은 미등록 시 확인된 Mac 기본값을 사용하고, 추론 수준·대화 검색은 대상 앱에서 단축키를 등록해야 합니다.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -503,6 +515,18 @@ private struct ContentView: View {
                         }
                         Text("시스템 설정 › 개인정보 보호 및 보안 › 손쉬운 사용에서 권한을 변경한 뒤 앱으로 돌아와 다시 시작하세요.")
                             .font(.caption).foregroundStyle(.secondary)
+                        Divider()
+                        Text("입력 전달 진단").font(.headline)
+                        Text("대상 앱 입력칸에서 실물 키를 한 번 누른 뒤 여기로 돌아와 확인하세요. ‘별칭 수신’이 없으면 장치·레이어·입력 변환 단계부터 확인해야 합니다.")
+                            .font(.caption).foregroundStyle(.secondary)
+                        if appRouting.inputDiagnostics.isEmpty {
+                            Text("라우터를 시작하면 진단이 표시됩니다.").font(.caption)
+                        } else {
+                            Text(appRouting.inputDiagnostics.joined(separator: "\n"))
+                                .font(.caption.monospaced())
+                                .textSelection(.enabled)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }.padding(8).frame(maxWidth: .infinity, alignment: .leading)
                 }
                 GroupBox("Codex CLI 전용 실행기") {

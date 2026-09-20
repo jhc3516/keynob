@@ -26,6 +26,7 @@ final class CodexTerminalLauncher: ObservableObject {
         tell application "Terminal"
             activate
             set macroPadTab to do script "\(appleScriptEscape(terminalCommand))"
+            set title displays custom title of macroPadTab to true
             set custom title of macroPadTab to "\(appleScriptEscape(title))"
         end tell
         """

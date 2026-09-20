@@ -10,7 +10,7 @@ public enum CodexAppKeybindingError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .unreadableFile:
-            "ChatGPT/Codex의 keybindings.json을 읽을 수 없습니다. 대상 앱의 설정 › 키보드 단축키에서 추론 수준 단축키를 등록하세요."
+            "ChatGPT/Codex의 keybindings.json을 읽을 수 없습니다. 대상 앱의 설정 › 키보드 단축키를 확인하세요."
         case .invalidFile:
             "ChatGPT/Codex의 keybindings.json 형식을 읽을 수 없습니다. 대상 앱의 키보드 단축키 설정을 확인하세요."
         case .unassignedCommand(let command):
@@ -18,13 +18,13 @@ public enum CodexAppKeybindingError: Error, LocalizedError, Equatable {
         case .unsupportedShortcut(let command):
             "\(command)에 등록된 단축키를 Mac에서 전달할 수 없습니다. 보조키와 일반 키 하나로 된 단축키를 등록하세요."
         case .unsupportedAction:
-            "이 대상 앱에서는 등록된 추론 수준 단축키를 확인할 수 없습니다."
+            "이 대상 앱에서는 등록된 동작 단축키를 확인할 수 없습니다."
         }
     }
 }
 
-/// Reads the desktop app's user keymap without modifying it. Reasoning commands
-/// have no default binding; Keynob routing aliases are not app commands.
+/// Reads user overrides without modifying them. Defaults below were verified
+/// against the installed desktop app 26.908.40834 macOS command catalog.
 public struct CodexAppKeybindings: Sendable {
     public let url: URL
 
@@ -39,11 +39,32 @@ public struct CodexAppKeybindings: Sendable {
         switch actionID {
         case "reasoning_down": "composer.decreaseReasoningEffort"
         case "reasoning_up": "composer.increaseReasoningEffort"
+        case "reasoning_cycle": "composer.cycleReasoningEffort"
+        case "model_selector": "composer.openModelPicker"
+        case "previous_conversation": "previousThread"
+        case "next_conversation": "nextThread"
+        case "switch_chat": "searchChats"
+        case "settings": "settings"
         default: nil
         }
     }
 
+    private static func defaultShortcut(for actionID: String) -> DeviceShortcut? {
+        let accelerator: String
+        switch actionID {
+        case "previous_conversation": accelerator = "Command+Shift+["
+        case "next_conversation": accelerator = "Command+Shift+]"
+        case "model_selector": accelerator = "Control+Shift+M"
+        case "settings": accelerator = "Command+,"
+        default: return nil
+        }
+        return parseAccelerator(accelerator)
+    }
+
     public func shortcut(for actionID: String) throws -> DeviceShortcut {
+        if !FileManager.default.fileExists(atPath: url.path), let shortcut = Self.defaultShortcut(for: actionID) {
+            return shortcut
+        }
         guard let data = try? Data(contentsOf: url) else { throw CodexAppKeybindingError.unreadableFile }
         return try Self.shortcut(for: actionID, data: data)
     }
@@ -66,6 +87,7 @@ public struct CodexAppKeybindings: Sendable {
         }
         let matches = entries.filter { $0.command == command }
         // A null entry explicitly disables all bindings for this command.
+        if matches.isEmpty, let shortcut = defaultShortcut(for: actionID) { return shortcut }
         guard !matches.isEmpty, !matches.contains(where: { $0.key == nil }) else {
             throw CodexAppKeybindingError.unassignedCommand(command)
         }

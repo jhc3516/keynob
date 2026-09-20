@@ -19,6 +19,13 @@ final class AppRoutingRuntime: ObservableObject {
     @Published private(set) var accessibilityGranted = AXIsProcessTrusted()
     @Published private(set) var message = "앱별 동작을 사용하려면 손쉬운 사용 권한이 필요합니다."
     @Published private(set) var actionError: String?
+    @Published private(set) var inputDiagnostics: [String] = []
+
+    private func recordDiagnostic(_ message: String) {
+        let time = Date().formatted(date: .omitted, time: .standard)
+        inputDiagnostics.append("\(time) · \(message)")
+        if inputDiagnostics.count > 12 { inputDiagnostics.removeFirst(inputDiagnostics.count - 12) }
+    }
 
     private let router = MacInputRouter()
     private let dispatcher = InputActionDispatcher()
@@ -37,10 +44,15 @@ final class AppRoutingRuntime: ObservableObject {
             return
         }
         do {
+            inputDiagnostics = []
+            recordDiagnostic("손쉬운 사용: 허용 · 입력 전송 권한: \(CGPreflightPostEventAccess() ? "허용" : "미허용") · 앱별 설정 \(settings.bindings.values.filter { $0.scope != .global }.count)개")
+            router.diagnosticHandler = { [weak self] text in self?.recordDiagnostic(text) }
             try router.start(settings: settings) { [weak self] alias, binding, target in
                 guard let self else { return }
                 self.dispatcher.dispatch(binding, expectedTarget: target) { [weak self] error in
                     self?.actionError = error
+                    self?.recordDiagnostic(error.map { "전송 중단: \($0)" }
+                        ?? "Layer \(alias.layer) / \(alias.input.label) → macOS에 입력 전송 요청 완료 (대상 앱 수신 여부는 입력칸에서 확인)")
                 }
             }
             isRunning = true
@@ -51,6 +63,8 @@ final class AppRoutingRuntime: ObservableObject {
             message = error.localizedDescription
         }
     }
+
+    func setShortcutRecording(_ active: Bool) { router.isRecordingShortcut = active }
 
     func stop() {
         router.stop()
@@ -75,6 +89,13 @@ private enum InputRouterError: Error, LocalizedError {
 private final class MacInputRouter: @unchecked Sendable {
     typealias Handler = @MainActor (MacInputAlias, RoutedBinding, ForegroundTarget) -> Void
 
+    var diagnosticHandler: (@MainActor (String) -> Void)?
+
+    private func diagnose(_ text: String) {
+        Task { @MainActor [diagnosticHandler] in diagnosticHandler?(text) }
+    }
+
+    var isRecordingShortcut = false
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var handler: Handler?
@@ -125,9 +146,11 @@ private final class MacInputRouter: @unchecked Sendable {
 
     private func handle(type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            diagnose("macOS가 입력 감시를 일시 중지하여 재활성화했습니다.")
             if let eventTap { CGEvent.tapEnable(tap: eventTap, enable: true) }
             return Unmanaged.passUnretained(event)
         }
+        if isRecordingShortcut { return Unmanaged.passUnretained(event) }
         if event.getIntegerValueField(.eventSourceUserData) == injectedEventMarker {
             return Unmanaged.passUnretained(event)
         }
@@ -142,15 +165,34 @@ private final class MacInputRouter: @unchecked Sendable {
         let isRepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
         if isRepeat, suppressedKeyCodes.contains(code) { return nil }
         let binding = settings.bindings[RoutingSettings.key(layer: alias.layer, input: alias.input)]
+        let hasModifiers = matchesAliasModifiers(event.flags)
+        // Only report configured alias candidates or exact alias chords; do not record ordinary typing.
+        if !hasModifiers {
+            if binding?.scope != nil, binding?.scope != .global, code >= 96 {
+                diagnose("Layer \(alias.layer) / \(alias.input.label) 후보 키 수신 · 별칭 보조키 불일치 (Control+Shift+Option 필요)")
+            }
+            return Unmanaged.passUnretained(event)
+        }
         let target = ForegroundScopeDetector.currentTarget()
+        if !isRepeat {
+            let prefix = "Layer \(alias.layer) / \(alias.input.label) 별칭 수신"
+            if let binding, binding.scope != .global {
+                diagnose("\(prefix) · 설정: \(binding.scope.displayName) · 대상: \(target?.scope.displayName ?? ForegroundScopeDetector.unavailableReason())")
+            } else {
+                diagnose("\(prefix) · 앱별 설정 없음. 새로 고침 후 저장한 범위를 확인하세요.")
+            }
+        }
         let decision = AppAliasRoutingDecision.decide(
-            binding: binding, hasAliasModifiers: matchesAliasModifiers(event.flags),
+            binding: binding, hasAliasModifiers: hasModifiers,
             targetScope: target?.scope, isRepeat: isRepeat)
         guard decision != .passThrough else {
             return Unmanaged.passUnretained(event)
         }
         suppressedKeyCodes.insert(code)
-        guard decision == .dispatch, let binding, let target else { return nil }
+        guard decision == .dispatch, let binding, let target else {
+            if !isRepeat { diagnose("입력 차단: 설정 범위와 현재 대상 앱·창이 일치하지 않습니다.") }
+            return nil
+        }
         let now = ProcessInfo.processInfo.systemUptime
         if now - (lastAcceptedAt[code] ?? 0) >= 0.15 {
             lastAcceptedAt[code] = now
@@ -171,9 +213,24 @@ private final class InputActionDispatcher {
         _ binding: RoutedBinding, expectedTarget: ForegroundTarget,
         completion: @escaping @MainActor (String?) -> Void
     ) {
-        guard expectedTarget.scope != .global, (try? BindingCompiler.validate(binding)) == true else { return }
+        guard expectedTarget.scope != .global else {
+            completion("앱별 전달 대상이 아닙니다."); return
+        }
+        do { _ = try BindingCompiler.validate(binding) }
+        catch { completion(error.localizedDescription); return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { [weak self] in
-            guard let self, ForegroundScopeDetector.currentTarget() == expectedTarget else { return }
+            guard let self else { return }
+            guard ForegroundScopeDetector.currentTarget() == expectedTarget else {
+                completion("전송 직전에 대상 앱·창이 바뀌었거나 대상을 읽지 못했습니다."); return
+            }
+            guard CGPreflightPostEventAccess() else {
+                completion("macOS 입력 전송 권한이 없습니다. 현재 Keynob 앱의 손쉬운 사용 권한을 다시 등록하세요."); return
+            }
+            if binding.scope == .chatGPT, binding.actionKind == .builtIn,
+               binding.builtInActionID == "reasoning_medium" {
+                completion("Medium 직접 지정은 지원하지 않습니다. ‘추론 수준 순환’ 또는 모델 선택기에서 직접 선택하세요.")
+                return
+            }
             if binding.scope == .chatGPT, binding.actionKind == .builtIn,
                let id = binding.builtInActionID, CodexAppKeybindings.commandID(for: id) != nil {
                 do {
@@ -181,7 +238,9 @@ private final class InputActionDispatcher {
                         throw CodexAppKeybindingError.unsupportedAction
                     }
                     let shortcut = try CodexAppKeybindings().shortcut(for: id)
-                    guard ForegroundScopeDetector.currentTarget() == expectedTarget else { return }
+                    guard ForegroundScopeDetector.currentTarget() == expectedTarget else {
+                        completion("단축키를 읽는 동안 대상 앱·창이 바뀌었습니다."); return
+                    }
                     self.send(shortcut: shortcut)
                     completion(nil)
                 } catch {
@@ -248,19 +307,11 @@ private final class InputActionDispatcher {
     private func sendBuiltIn(_ id: String, scope: BindingScope) {
         if scope == .chatGPT {
             switch id {
-            case "previous_conversation": postKey(116, modifiers: .maskControl)
-            case "next_conversation": postKey(121, modifiers: .maskControl)
-            case "switch_chat": postKey(5, modifiers: .maskControl)
             case "enter": postKey(36)
-            case "reasoning_medium":
-                for _ in 0..<6 { postKey(123, modifiers: [.maskControl, .maskShift, .maskAlternate]) }
-                postKey(124, modifiers: [.maskControl, .maskShift, .maskAlternate])
             case "model_menu_up": postKey(126)
             case "model_menu_down": postKey(125)
-            case "model_selector": postKey(115, modifiers: [.maskControl, .maskShift, .maskAlternate])
             case "skills": openCodexURL("codex://skills")
             case "automations": openCodexURL("codex://automations")
-            case "settings": openCodexURL("codex://settings")
             case "copy": postKey(8, modifiers: .maskCommand)
             default: break
             }
@@ -331,6 +382,20 @@ private final class InputActionDispatcher {
 }
 
 private enum ForegroundScopeDetector {
+    static func unavailableReason() -> String {
+        guard let app = NSWorkspace.shared.frontmostApplication else { return "전경 앱을 읽지 못함" }
+        guard app.bundleIdentifier == AppTargetPolicy.terminalBundleIdentifier else {
+            return "지원 대상 아님 (\(app.bundleIdentifier ?? "알 수 없는 앱"))"
+        }
+        let title = focusedWindowTitle(pid: app.processIdentifier)
+        guard !title.isEmpty else { return "Terminal 창 제목을 읽지 못함" }
+        guard let id = AppTargetPolicy.instanceID(fromTerminalWindowTitle: title) else {
+            return "전용 CLI 창 제목과 불일치"
+        }
+        return DedicatedCLIRegistry.shared.contains(instanceID: id)
+            ? "전경 창 재확인 필요" : "전용 CLI 등록 없음. Keynob에서 새로 여세요."
+    }
+
     static func currentTarget() -> ForegroundTarget? {
         guard let app = NSWorkspace.shared.frontmostApplication else { return nil }
         if AppTargetPolicy.chatGPTBundleIdentifiers.contains(app.bundleIdentifier ?? "") {
@@ -338,8 +403,7 @@ private enum ForegroundScopeDetector {
         }
         guard app.bundleIdentifier == AppTargetPolicy.terminalBundleIdentifier else { return nil }
         let title = focusedWindowTitle(pid: app.processIdentifier)
-        guard let instanceID = AppTargetPolicy.instanceID(fromDedicatedCLITitle: title),
-              DedicatedCLIRegistry.shared.contains(instanceID: instanceID) else { return nil }
+        guard let instanceID = DedicatedCLIRegistry.shared.instanceID(forWindowTitle: title) else { return nil }
         return ForegroundTarget(scope: .codexCLI, processID: app.processIdentifier, instanceID: instanceID)
     }
 

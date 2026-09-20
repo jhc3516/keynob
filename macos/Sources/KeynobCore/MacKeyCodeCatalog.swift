@@ -23,5 +23,11 @@ public enum MacKeyCodeCatalog {
 
     public static func cgKeyCode(hidCode: UInt8) -> UInt16? { map[hidCode] }
 
+    public static func hidCode(virtualKeyCode: UInt16) -> UInt8? {
+        // Numeric keypad Enter is stored as ordinary Enter, matching Windows.
+        if virtualKeyCode == 76 { return 0x28 }
+        return map.first { $0.value == virtualKeyCode }?.key
+    }
+
     public static let regularKeys = DeviceKeyCatalog.regularKeys.filter { map[$0.code] != nil }
 }
