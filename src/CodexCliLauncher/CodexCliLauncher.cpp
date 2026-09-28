@@ -420,6 +420,7 @@ int Run(int argc, wchar_t** argv) {
 
     const std::vector<std::wstring> arguments = {
         codex->node.wstring(), codex->codexJavaScript.wstring(),
+        L"--no-daemon",
         L"--config", kDisableTerminalTitleUpdates,
         L"-C", workingDirectory->wstring()
     };

@@ -127,11 +127,12 @@ setTimeout(() => {
     if (-not [string]::Equals($probe.cwd, $projectDirectory, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Launcher working directory mismatch. expected=$projectDirectory actual=$($probe.cwd)"
     }
-    if ($probe.args.Count -ne 4 -or
-        $probe.args[0] -cne '--config' -or
-        $probe.args[1] -cne 'tui.terminal_title=[]' -or
-        $probe.args[2] -cne '-C' -or
-        -not [string]::Equals($probe.args[3], $projectDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+    if ($probe.args.Count -ne 5 -or
+        $probe.args[0] -cne '--no-daemon' -or
+        $probe.args[1] -cne '--config' -or
+        $probe.args[2] -cne 'tui.terminal_title=[]' -or
+        $probe.args[3] -cne '-C' -or
+        -not [string]::Equals($probe.args[4], $projectDirectory, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Launcher arguments mismatch: $($probe.args -join '|')"
     }
     if ([string]$probe.instance -cnotmatch '^[0-9a-f]{32}$') {
@@ -160,11 +161,12 @@ setTimeout(() => {
     }
     $rootProbe = Get-Content -LiteralPath $rootProbePath -Raw -Encoding UTF8 | ConvertFrom-Json
     if (-not [string]::Equals($rootProbe.cwd, $driveRoot, [StringComparison]::OrdinalIgnoreCase) -or
-        $rootProbe.args.Count -ne 4 -or
-        $rootProbe.args[0] -cne '--config' -or
-        $rootProbe.args[1] -cne 'tui.terminal_title=[]' -or
-        $rootProbe.args[2] -cne '-C' -or
-        -not [string]::Equals($rootProbe.args[3], $driveRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        $rootProbe.args.Count -ne 5 -or
+        $rootProbe.args[0] -cne '--no-daemon' -or
+        $rootProbe.args[1] -cne '--config' -or
+        $rootProbe.args[2] -cne 'tui.terminal_title=[]' -or
+        $rootProbe.args[3] -cne '-C' -or
+        -not [string]::Equals($rootProbe.args[4], $driveRoot, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Trailing-backslash working directory was not preserved: $($rootProbe | ConvertTo-Json -Compress)"
     }
 
