@@ -39,14 +39,14 @@ macOS의 모든 앱별 동작과 Intel 장치 입력은 아직 실물 검증을 
 
 ### Windows
 
-1. [Windows beta.1 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.1)에서
-   `MacroPadStudio-v1.0.0-beta.1-win-x64.zip`을 받습니다.
-2. 원하는 폴더에 압축을 모두 풀고 `CodexKeyboardStudio.exe`를 실행합니다.
+1. [Keynob beta.3 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.3)에서
+   `Keynob-v1.0.0-beta.3-win-x64.zip`을 받습니다.
+2. 원하는 폴더에 압축을 모두 풀고 `Keynob.exe`를 실행합니다.
 3. 매크로패드를 USB로 연결하고 앱에서 장치가 인식되는지 확인합니다.
 
-이 배포본은 이름 변경 전에 만들어져 파일과 화면에 **MacroPad Studio**가 표시됩니다.
-현재 소스를 직접 빌드하면 `Keynob.exe`가 생성됩니다. 베타 실행 파일은 코드 서명되지 않아
-Windows에서 게시자 경고가 표시될 수 있습니다.
+배포 파일과 앱 화면은 **Keynob**로 표시됩니다. 베타 실행 파일은 코드 서명되지 않아
+Windows에서 게시자 경고가 표시될 수 있습니다. 이전 버전을 사용 중이라면
+[업그레이드 안내](docs/upgrading.md)를 확인하세요.
 
 [Windows 상세 안내와 소스 빌드](docs/windows.md)
 

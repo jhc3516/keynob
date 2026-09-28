@@ -4,9 +4,9 @@
 
 ## 설치 및 사용
 
-1. [Windows beta.1 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.1)에서 `MacroPadStudio-v1.0.0-beta.1-win-x64.zip`을 받습니다.
+1. [Keynob beta.3 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.3)에서 `Keynob-v1.0.0-beta.3-win-x64.zip`을 받습니다.
 2. 원하는 폴더에 압축을 풉니다.
-3. beta.1 배포본에서는 `CodexKeyboardStudio.exe`를 실행합니다. 화면에는 이전 이름인 MacroPad Studio가 표시됩니다. 현재 소스를 빌드하면 `Keynob.exe`가 생성됩니다.
+3. `Keynob.exe`를 실행합니다. 앱 화면에도 Keynob로 표시됩니다.
 4. 레이어와 키·노브 동작을 편집한 뒤 `변경 내용 적용`을 누릅니다.
 
 적용 직전에 현재 레이어 25슬롯과 LED 상태가

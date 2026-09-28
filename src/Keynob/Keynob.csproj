@@ -15,7 +15,7 @@
     <Description>A macro keypad companion for ChatGPT and Codex CLI on Windows.</Description>
     <Authors>jhc3516</Authors>
     <Copyright>Copyright (c) 2026 jhc3516</Copyright>
-    <Version>1.0.0-beta.1</Version>
+    <Version>1.0.0-beta.3</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <Deterministic>true</Deterministic>
     <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..'))=C:\_\Keynob</PathMap>

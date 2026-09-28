@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = 'v1.0.0-beta.1',
+    [string]$Version = 'v1.0.0-beta.3',
     [string]$PortablePath = 'artifacts\portable',
     [string]$SourcePath = 'artifacts\public-source',
     [string]$OutputPath = 'artifacts\release'
@@ -29,6 +29,8 @@ foreach ($required in @(
     if (-not (Test-Path -LiteralPath (Join-Path $portable $required) -PathType Leaf)) { throw "Portable input is incomplete: $required" }
 }
 if (-not (Test-Path -LiteralPath (Join-Path $source 'README.md') -PathType Leaf)) { throw 'Public source input is incomplete.' }
+$releaseNotes = Join-Path $source "docs\release-notes-$Version.md"
+if (-not (Test-Path -LiteralPath $releaseNotes -PathType Leaf)) { throw "Release notes are missing: $Version" }
 if (Get-ChildItem -LiteralPath $portable -Filter '*.pdb' -File -Recurse | Select-Object -First 1) {
     throw 'Portable input contains debug symbols.'
 }
@@ -74,6 +76,6 @@ $sha256 = [Security.Cryptography.SHA256]::Create()
 try { $sourceHash = ([BitConverter]::ToString($sha256.ComputeHash($sourceBytes))).Replace('-', '').ToLowerInvariant() }
 finally { $sha256.Dispose() }
 [IO.File]::WriteAllText((Join-Path $output "Keynob-$Version-source.sha256"), "$sourceHash  public-source`n", $utf8)
-Copy-Item -LiteralPath (Join-Path $source 'docs\release-notes-v1.0.0-beta.1.md') -Destination (Join-Path $output 'RELEASE_NOTES.md') -Force
+Copy-Item -LiteralPath $releaseNotes -Destination (Join-Path $output 'RELEASE_NOTES.md') -Force
 
 Write-Output "PUBLIC_RELEASE_PASS zip=$zipPath sha256=$zipHash sourceSha256=$sourceHash files=$(@(Get-ChildItem -LiteralPath $portable -File -Recurse).Count)"
