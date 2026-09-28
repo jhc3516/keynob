@@ -46,6 +46,7 @@ MacroPad Studio 또는 이전 Keynob를 사용 중이라면 [업그레이드 안
 아래 문서는 각 태그 당시의 이름·경로·검증 결과를 보존합니다.
 현재 소스의 사용법은 위 플랫폼별 안내를 따르세요.
 
+- [v1.0.0-beta.4](release-notes-v1.0.0-beta.4.md): 공개 문서와 소스 이력 정리
 - [v1.0.0-beta.3](release-notes-v1.0.0-beta.3.md): Keynob 이름의 Windows 배포본과 소스
 - [v1.0.0-beta.2](release-notes-v1.0.0-beta.2.md): macOS 소스 추가
 - [v1.0.0-beta.1](release-notes-v1.0.0-beta.1.md): Windows 베타

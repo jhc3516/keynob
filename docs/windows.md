@@ -4,7 +4,7 @@
 
 ## 설치 및 사용
 
-1. [Keynob beta.3 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.3)에서 `Keynob-v1.0.0-beta.3-win-x64.zip`을 받습니다.
+1. [Keynob beta.4 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.4)에서 `Keynob-v1.0.0-beta.4-win-x64.zip`을 받습니다.
 2. 원하는 폴더에 압축을 풉니다.
 3. `Keynob.exe`를 실행합니다. 앱 화면에도 Keynob로 표시됩니다.
 4. 레이어와 키·노브 동작을 편집한 뒤 `변경 내용 적용`을 누릅니다.

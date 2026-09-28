@@ -39,8 +39,8 @@ macOS의 모든 앱별 동작과 Intel 장치 입력은 아직 실물 검증을 
 
 ### Windows
 
-1. [Keynob beta.3 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.3)에서
-   `Keynob-v1.0.0-beta.3-win-x64.zip`을 받습니다.
+1. [Keynob beta.4 다운로드 페이지](https://github.com/jhc3516/keynob/releases/tag/v1.0.0-beta.4)에서
+   `Keynob-v1.0.0-beta.4-win-x64.zip`을 받습니다.
 2. 원하는 폴더에 압축을 모두 풀고 `Keynob.exe`를 실행합니다.
 3. 매크로패드를 USB로 연결하고 앱에서 장치가 인식되는지 확인합니다.
 

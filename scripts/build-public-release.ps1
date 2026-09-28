@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Version = 'v1.0.0-beta.3',
+    [string]$Version = 'v1.0.0-beta.4',
     [string]$PortablePath = 'artifacts\portable',
     [string]$SourcePath = 'artifacts\public-source',
     [string]$OutputPath = 'artifacts\release'
