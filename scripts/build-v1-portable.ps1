@@ -39,7 +39,8 @@ foreach ($fileName in @('KeyboardDeviceBridge.exe', 'CodexStatusHookClient.exe',
 foreach ($fileName in @(
     'LICENSE', 'THIRD_PARTY_NOTICES.md', 'DOTNET-LIBRARY-LICENSE.txt', 'DOTNET-MIT-LICENSE.txt',
     'DOTNET-THIRD-PARTY-NOTICES.txt', 'WPF-THIRD-PARTY-NOTICES.txt', 'WINDOWS-SDK-LICENSE.rtf')) {
-    Copy-Item -LiteralPath (Join-Path $root $fileName) -Destination (Join-Path $portableDir $fileName) -Force
+    $sourceDirectory = if ($fileName -in @('LICENSE', 'THIRD_PARTY_NOTICES.md')) { $root } else { Join-Path $root 'licenses' }
+    Copy-Item -LiteralPath (Join-Path $sourceDirectory $fileName) -Destination (Join-Path $portableDir $fileName) -Force
 }
 $launcherSource = Join-Path $frameworkArtifacts 'Start-CodexCli.exe'
 $launcherDestination = Join-Path $root 'Start-CodexCli.exe'

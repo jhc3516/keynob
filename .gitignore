@@ -27,3 +27,7 @@ tools/*.lib
 **/.build/
 *.suo
 *.user
+
+# macOS Finder metadata
+.DS_Store
+._*

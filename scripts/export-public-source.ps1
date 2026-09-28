@@ -27,13 +27,11 @@ function Copy-PublicFile([string]$sourceRelative, [string]$destinationRelative =
 
 foreach ($file in @(
     '.gitattributes', '.gitignore', 'Keynob.sln', 'NuGet.Config', 'NuGet.Portable.Config',
-    'LICENSE', 'THIRD_PARTY_NOTICES.md', 'DOTNET-LIBRARY-LICENSE.txt', 'DOTNET-MIT-LICENSE.txt',
-    'DOTNET-THIRD-PARTY-NOTICES.txt', 'WPF-THIRD-PARTY-NOTICES.txt', 'WINDOWS-SDK-LICENSE.rtf')) {
+    'LICENSE', 'THIRD_PARTY_NOTICES.md', 'licenses\DOTNET-LIBRARY-LICENSE.txt', 'licenses\DOTNET-MIT-LICENSE.txt',
+    'licenses\DOTNET-THIRD-PARTY-NOTICES.txt', 'licenses\WPF-THIRD-PARTY-NOTICES.txt', 'licenses\WINDOWS-SDK-LICENSE.rtf')) {
     Copy-PublicFile $file
 }
 Copy-PublicFile 'README.md'
-Copy-PublicFile 'docs\device-protocol.md'
-Copy-PublicFile 'docs\release-notes-v1.0.0-beta.1.md' 'docs\release-notes-v1.0.0-beta.1.md'
 foreach ($file in @(
     'assets\keynob.ico', 'assets\keynob.jpg',
     'config\codex-keymap.json')) {
@@ -91,9 +89,9 @@ foreach ($file in $textFiles) {
     }
 }
 foreach ($required in @(
-    '.gitattributes', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'DOTNET-LIBRARY-LICENSE.txt',
-    'DOTNET-MIT-LICENSE.txt', 'DOTNET-THIRD-PARTY-NOTICES.txt', 'WPF-THIRD-PARTY-NOTICES.txt',
-    'WINDOWS-SDK-LICENSE.rtf', 'assets\keynob.jpg', 'scripts\prepare-hidapi.ps1')) {
+    '.gitattributes', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'licenses\DOTNET-LIBRARY-LICENSE.txt',
+    'licenses\DOTNET-MIT-LICENSE.txt', 'licenses\DOTNET-THIRD-PARTY-NOTICES.txt', 'licenses\WPF-THIRD-PARTY-NOTICES.txt',
+    'licenses\WINDOWS-SDK-LICENSE.rtf', 'assets\keynob.jpg', 'scripts\prepare-hidapi.ps1')) {
     if (-not (Test-Path -LiteralPath (Join-Path $output $required))) { throw "Public source is incomplete: $required" }
 }
 

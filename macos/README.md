@@ -1,11 +1,13 @@
 # Keynob for macOS
 
+[프로젝트 소개](../README.md) · [문서 목록](../docs/README.md)
+
 ChatGPT 앱과 Codex CLI를 키·노브로 제어하는 Keynob의 네이티브 Swift/SwiftUI 앱입니다.
 Windows 구현과 나란히 유지됩니다. 지원 장치를 정확히
 식별하고 세 레이어의 키·노브, 앱별 동작과 12개 LED를 읽고 설정합니다.
 
 이전 MacroPad Studio의 설정 경로와 번들 ID는 호환성을 위해 유지합니다.
-[이전 버전에서 업그레이드](../README.md#이전-버전에서-업그레이드)
+[이전 버전에서 업그레이드](../docs/upgrading.md)
 
 ## 지원 범위
 

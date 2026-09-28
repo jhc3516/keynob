@@ -3,7 +3,8 @@
 ## Microsoft .NET 10 and Windows Desktop
 
 The Windows x64 self-contained package includes .NET 10.0.10 and WPF runtime files.
-The accompanying license and notice texts are distributed as:
+The source repository keeps the original texts in `licenses/`. Windows portable
+packages include the same files at the package root:
 
 - `DOTNET-LIBRARY-LICENSE.txt`
 - `DOTNET-MIT-LICENSE.txt`
