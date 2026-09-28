@@ -33,7 +33,7 @@ foreach ($file in @(
 }
 Copy-PublicFile 'README.md'
 foreach ($file in @(
-    'assets\keynob.ico', 'assets\keynob.jpg',
+    'assets\keynob.ico', 'assets\keynob.jpg', 'assets\keynob-macos.png',
     'config\codex-keymap.json')) {
     Copy-PublicFile $file
 }

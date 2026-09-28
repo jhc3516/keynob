@@ -10,6 +10,16 @@ Windows와 macOS에서 사용할 수 있으며, ChatGPT 앱과 Codex CLI를 위�
 - ChatGPT·Codex CLI에서만 실행할 동작 지정
 - 선택적으로 Codex CLI의 작업·승인 대기·완료·오류 상태를 LED로 표시
 
+## 앱 화면
+
+| macOS | Windows |
+| --- | --- |
+| ![Keynob macOS 키·노브 설정 화면](assets/keynob-macos.png) | 스크린샷 준비 중 |
+
+macOS: USB 장치를 연결하기 전의 키·노브 설정 화면입니다.
+
+<!-- Windows 캡처는 assets/keynob-windows.png로 저장한 뒤 위 표에 연결합니다. -->
+
 ## 준비물과 지원 환경
 
 [지원 제품 판매 페이지](https://www.aliexpress.com/item/1005006437127027.html)의 **12키·2노브 모델**과 USB 연결이 필요합니다.
