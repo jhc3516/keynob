@@ -14,11 +14,10 @@ Windows와 macOS에서 사용할 수 있으며, ChatGPT 앱과 Codex CLI를 위�
 
 | macOS | Windows |
 | --- | --- |
-| ![Keynob macOS 키·노브 설정 화면](assets/keynob-macos.png) | 스크린샷 준비 중 |
+| ![Keynob macOS 키·노브 설정 화면](assets/keynob-macos.png) | ![Keynob Windows 키·노브 설정 화면](assets/keynob-windows.jpg) |
 
 macOS: USB 장치를 연결하기 전의 키·노브 설정 화면입니다.
-
-<!-- Windows 캡처는 assets/keynob-windows.png로 저장한 뒤 위 표에 연결합니다. -->
+Windows: USB 장치가 연결된 키·노브 설정 화면입니다.
 
 ## 준비물과 지원 환경
 
