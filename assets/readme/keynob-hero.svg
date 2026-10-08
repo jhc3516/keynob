@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">Keynob, AI tools at your fingertips</title>
+  <desc id="desc">A dark interface-inspired composition showing twelve programmable keys, two knobs, three layers, and Codex status lights.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081716"/>
+      <stop offset="0.55" stop-color="#0f2524"/>
+      <stop offset="1" stop-color="#151d1c"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#54e7cd"/>
+      <stop offset="1" stop-color="#20bda8"/>
+    </linearGradient>
+    <radialGradient id="knob" cx="38%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#2c4a47"/>
+      <stop offset="1" stop-color="#142927"/>
+    </radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <style>
+      .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+      .key { fill: #112826; stroke: #34504d; stroke-width: 1.5; }
+      .key-label { fill: #6eead4; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+      .key-action { fill: #f4fbfa; font-size: 15px; font-weight: 650; }
+      .tick { stroke: #6b8a86; stroke-width: 2; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="420" rx="30" fill="url(#bg)"/>
+  <circle cx="1090" cy="55" r="210" fill="#163f38" opacity="0.38"/>
+  <circle cx="104" cy="414" r="170" fill="#745a1d" opacity="0.12"/>
+  <path d="M0 330 C260 276 420 444 685 374 S1010 312 1200 348 V420 H0Z" fill="#081312" opacity="0.55"/>
+
+  <g class="sans" transform="translate(68 62)">
+    <text x="0" y="22" fill="#62e5cf" font-size="14" font-weight="750" letter-spacing="3">12 KEYS · 2 KNOBS · 3 LAYERS</text>
+    <text x="0" y="106" fill="#f7fffd" font-size="76" font-weight="800" letter-spacing="-2">KEYNOB</text>
+    <text x="3" y="156" fill="#b7cbc8" font-size="27" font-weight="500">AI tools at your fingertips.</text>
+
+    <g transform="translate(2 207)">
+      <rect x="0" y="0" width="396" height="62" rx="15" fill="#112826" stroke="#2f4b48"/>
+      <circle cx="30" cy="31" r="8" fill="#54e7cd"/>
+      <text x="52" y="26" fill="#eef8f6" font-size="15" font-weight="700">CODEX STATUS</text>
+      <text x="52" y="47" fill="#8eaaa6" font-size="13">running · approval · done · error</text>
+    </g>
+
+    <g transform="translate(2 293)">
+      <rect x="0" y="0" width="104" height="34" rx="17" fill="#193532"/>
+      <text x="52" y="22" text-anchor="middle" fill="#8eaaa6" font-size="13" font-weight="700">WINDOWS</text>
+      <rect x="114" y="0" width="94" height="34" rx="17" fill="#193532"/>
+      <text x="161" y="22" text-anchor="middle" fill="#8eaaa6" font-size="13" font-weight="700">macOS</text>
+      <rect x="218" y="0" width="132" height="34" rx="17" fill="#193532"/>
+      <text x="284" y="22" text-anchor="middle" fill="#8eaaa6" font-size="13" font-weight="700">OPEN SOURCE</text>
+    </g>
+  </g>
+
+  <g transform="translate(590 43)">
+    <rect width="548" height="334" rx="28" fill="#0b1716" stroke="#2f4b48" stroke-width="2"/>
+    <rect x="24" y="22" width="96" height="30" rx="15" fill="#f2bd54"/>
+    <text class="sans" x="72" y="42" text-anchor="middle" fill="#1b201f" font-size="13" font-weight="800">LAYER 1</text>
+    <text class="mono" x="140" y="42" fill="#75918d" font-size="13">CHATGPT + CODEX</text>
+
+    <g transform="translate(24 72)">
+      <g transform="translate(0 0)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">01</text><text class="mono key-action" x="36" y="46" text-anchor="middle">/new</text></g>
+      <g transform="translate(84 0)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">02</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="12">/resume</text></g>
+      <g transform="translate(168 0)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">03</text><text class="mono key-action" x="36" y="46" text-anchor="middle">/plan</text></g>
+      <g transform="translate(252 0)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">04</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="11">/compact</text></g>
+
+      <g transform="translate(0 74)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">05</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="12">Ctrl K</text></g>
+      <g transform="translate(84 74)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">06</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="12">Ctrl L</text></g>
+      <g transform="translate(168 74)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">07</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="12">/agents</text></g>
+      <g transform="translate(252 74)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">08</text><text class="mono key-action" x="36" y="46" text-anchor="middle">Enter</text></g>
+
+      <g transform="translate(0 148)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">09</text><text class="mono key-action" x="36" y="46" text-anchor="middle">Tab</text></g>
+      <g transform="translate(84 148)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">10</text><text class="mono key-action" x="36" y="46" text-anchor="middle">Alt</text></g>
+      <g transform="translate(168 148)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">11</text><text class="mono key-action" x="36" y="46" text-anchor="middle" font-size="12">Back</text></g>
+      <g transform="translate(252 148)"><rect class="key" width="72" height="62" rx="13"/><text class="sans key-label" x="12" y="21">12</text><text class="mono key-action" x="36" y="46" text-anchor="middle">Esc</text></g>
+    </g>
+
+    <g transform="translate(432 118)">
+      <circle cx="0" cy="0" r="56" fill="#43d8bf" opacity="0.12" filter="url(#glow)"/>
+      <circle cx="0" cy="0" r="49" fill="url(#knob)" stroke="#3c5c58" stroke-width="2"/>
+      <path d="M0 -36 V-25" class="tick" stroke="#63ead3"/>
+      <text class="sans" x="0" y="5" text-anchor="middle" fill="#64e8d1" font-size="13" font-weight="800">KNOB 1</text>
+      <text class="sans" x="0" y="24" text-anchor="middle" fill="#9cb4b0" font-size="11">REASONING</text>
+      <text class="mono" x="-58" y="70" text-anchor="middle" fill="#76938f" font-size="18">−</text>
+      <text class="mono" x="58" y="70" text-anchor="middle" fill="#76938f" font-size="18">+</text>
+    </g>
+
+    <g transform="translate(432 252)">
+      <circle cx="0" cy="0" r="47" fill="url(#knob)" stroke="#3c5c58" stroke-width="2"/>
+      <path d="M0 -34 V-24" class="tick" stroke="#f2bd54"/>
+      <text class="sans" x="0" y="5" text-anchor="middle" fill="#f2bd54" font-size="13" font-weight="800">KNOB 2</text>
+      <text class="sans" x="0" y="24" text-anchor="middle" fill="#9cb4b0" font-size="11">SCROLL</text>
+    </g>
+  </g>
+</svg>
