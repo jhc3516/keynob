@@ -17,6 +17,20 @@ Windows·macOS 오픈 소스 앱입니다.
 > 현재 확인된 장치는 **12키·2노브**, VID `514C`, PID `8850` 모델입니다.
 > 외형이 같더라도 보고서 구조가 다르면 호환되지 않습니다.
 
+## 사용하는 매크로패드
+
+<p align="center">
+  <a href="https://s.click.aliexpress.com/e/_c3EbIGcv">
+    <img src="assets/keynob-macropad.webp" alt="Keynob에서 사용하는 12키·2노브 RGB 매크로패드" width="640">
+  </a>
+  <br>
+  <sub>제품 사진: AliExpress 판매 페이지 제공 · 옵션과 구성은 판매 시점에 따라 달라질 수 있습니다.</sub>
+</p>
+
+Keynob에서 사용하는 물리 장치는 [이 제품의 12키·2노브 모델](https://s.click.aliexpress.com/e/_c3EbIGcv)입니다.
+구매할 때 키와 노브 수를 확인하세요. 판매 옵션이나 내부 펌웨어가 바뀔 수 있으므로 외형만으로 판단하지 말고,
+연결 후 VID `514C`·PID `8850`과 [장치 프로토콜](docs/device-protocol.md)을 함께 확인하는 것이 안전합니다.
+
 ## 손끝에 놓는 AI 작업
 
 | 하고 싶은 일 | Keynob에서 설정하는 방법 |
@@ -57,8 +71,8 @@ Windows·macOS 오픈 소스 앱입니다.
 | Windows 10/11 x64 | 베타 실행 파일 | ZIP을 내려받아 압축 해제 |
 | macOS 13 이상 | 실험판 소스, 로컬 빌드 | Swift 6과 호환되는 Xcode 또는 Command Line Tools |
 
-[지원 제품 판매 페이지](https://www.aliexpress.com/item/1005006437127027.html)의 **12키·2노브 모델**과
-USB 연결이 필요합니다. 일반 키 입력은 USB 또는 Bluetooth로 사용할 수 있지만, 장치 설정은 USB로 진행합니다.
+[위 제품의 12키·2노브 모델](https://s.click.aliexpress.com/e/_c3EbIGcv)과 USB 연결이 필요합니다.
+일반 키 입력은 USB 또는 Bluetooth로 사용할 수 있지만, 장치 설정은 USB로 진행합니다.
 상세 호환 조건은 [장치 프로토콜](docs/device-protocol.md)을 확인하세요.
 
 macOS의 모든 앱별 동작과 Intel 장치 입력은 아직 실물 검증을 완료하지 않았습니다.
